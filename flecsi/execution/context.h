@@ -457,6 +457,13 @@ struct context__ : public CONTEXT_POLICY {
     colorings_[index_space] = coloring;
     coloring_info_[index_space] = coloring_info;
   } // add_coloring
+  
+  void add_coloring_coloring_info(
+      size_t index_space,
+      std::unordered_map<size_t, coloring_info_t> & coloring_info) {
+
+    coloring_info_[index_space] = coloring_info;
+  } // add_coloring
 
   /*!
     Return the index coloring referenced by key.

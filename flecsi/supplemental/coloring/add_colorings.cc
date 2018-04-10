@@ -24,6 +24,9 @@
 #include <flecsi/supplemental/coloring/coloring_functions.h>
 #include <flecsi/supplemental/coloring/tikz.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 clog_register_tag(coloring);
 clog_register_tag(coloring_output);
 
@@ -180,6 +183,7 @@ void add_colorings(coloring_map_t map) {
   size_t offset(0);
   for(auto i: std::get<0>(cell_nn_info)) {
     if(i.size()) {
+      printf("rank %d, shared %d, offset %d\n", rank, primary_indices_map[offset], offset);
       cells.shared.insert(
         flecsi::coloring::entity_info_t(primary_indices_map[offset],
         rank, offset, i));
@@ -190,6 +194,7 @@ void add_colorings(coloring_map_t map) {
         cell_color_info.shared_users, i);
     }
     else {
+      printf("rank %d, exclusive %d, offset %d\n", rank, primary_indices_map[offset], offset);
       cells.exclusive.insert(
         flecsi::coloring::entity_info_t(primary_indices_map[offset],
         rank, offset, i));
@@ -390,6 +395,7 @@ void add_colorings(coloring_map_t map) {
   // Add colorings to the context.
   context_.add_coloring(map.cells, cells, cell_coloring_info);
   context_.add_coloring(map.vertices, vertices, vertex_coloring_info);
+   printf("rank %d, pid %d\n", rank, getpid());
 
 #if 0
   context_.add_index_space(0, cells, cell_coloring_info);

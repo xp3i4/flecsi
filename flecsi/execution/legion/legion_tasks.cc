@@ -203,7 +203,22 @@ __flecsi_internal_register_legion_task(
     verify_vertex_color_task,
     processor_type_t::loc,
     index | leaf);
-		
+
+/*!
+  Register init offset index task.
+
+  \remark The translation unit that contains this call will not be
+         necessary with C++17, as it will be possible to move this call
+         into the header file using inline variables.
+
+  @ingroup legion-execution
+ */
+
+__flecsi_internal_register_legion_task(
+    init_entity_offset_task,
+    processor_type_t::loc,
+    index | leaf);
+      		
 /*!
   Register verify dependent partition index task.
 
