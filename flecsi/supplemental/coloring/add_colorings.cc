@@ -395,7 +395,6 @@ void add_colorings(coloring_map_t map) {
   // Add colorings to the context.
   context_.add_coloring(map.cells, cells, cell_coloring_info);
   context_.add_coloring(map.vertices, vertices, vertex_coloring_info);
-   printf("rank %d, pid %d\n", rank, getpid());
 
 #if 0
   context_.add_index_space(0, cells, cell_coloring_info);

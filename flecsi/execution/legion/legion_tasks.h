@@ -767,6 +767,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 	const Legion::FieldAccessor<READ_ONLY,int,1> cell_ghost_offset_acc(regions[1], FID_CELL_OFFSET);
 	const Legion::FieldAccessor<READ_ONLY,int,1> cell_shared_offset_acc(regions[2], FID_CELL_OFFSET);
 	const Legion::FieldAccessor<READ_ONLY,int,1> cell_exclusive_offset_acc(regions[3], FID_CELL_OFFSET);
+  
+  const Legion::FieldAccessor<READ_ONLY,LegionRuntime::Arrays::Point<1>,1> cell_ghost_color_acc(regions[1], FID_CELL_PARTITION_COLOR);
 	
 	const Legion::FieldAccessor<READ_ONLY,int,1> vertex_primary_id_acc(regions[4], FID_VERTEX_ID);
 	const Legion::FieldAccessor<READ_ONLY,int,1> vertex_ghost_id_acc(regions[5], FID_VERTEX_ID);
@@ -776,16 +778,20 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 	const Legion::FieldAccessor<READ_ONLY,int,1> vertex_ghost_offset_acc(regions[5], FID_VERTEX_OFFSET);
 	const Legion::FieldAccessor<READ_ONLY,int,1> vertex_shared_offset_acc(regions[6], FID_VERTEX_OFFSET);
 	const Legion::FieldAccessor<READ_ONLY,int,1> vertex_exclusive_offset_acc(regions[7], FID_VERTEX_OFFSET);
+  
+  const Legion::FieldAccessor<READ_ONLY,LegionRuntime::Arrays::Point<1>,1> vertex_ghost_color_acc(regions[5], FID_VERTEX_PARTITION_COLOR);
 	
 	const Legion::FieldAccessor<READ_ONLY,int,1> vertex_of_ghost_cell_id_acc(regions[8], FID_VERTEX_ID);
 	const Legion::FieldAccessor<READ_ONLY,int,1> reachable_cell_id_acc(regions[9], FID_CELL_ID);
 	const Legion::FieldAccessor<READ_ONLY,int,1> cell_primary_image_nrange_id_acc(regions[10], FID_CELL_TO_CELL_ID);
-  
+
+#if 0  
   const Legion::FieldAccessor<READ_ONLY,int,1> cell_all_shared_id_acc(regions[11], FID_CELL_ID);
   const Legion::FieldAccessor<READ_ONLY,LegionRuntime::Arrays::Point<1>,1> cell_all_shared_color_acc(regions[11], FID_CELL_PARTITION_COLOR);
   const Legion::FieldAccessor<READ_ONLY,int,1> vertex_all_shared_id_acc(regions[12], FID_VERTEX_ID);
   const Legion::FieldAccessor<READ_ONLY,LegionRuntime::Arrays::Point<1>,1> vertex_all_shared_color_acc(regions[12], FID_VERTEX_PARTITION_COLOR);
-	
+#endif
+  
   printf("\n");
   
   flecsi::coloring::index_coloring_t cells;
@@ -821,6 +827,7 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 	
 	printf("[%d, Cell] ghost, ", my_rank);								 
   for (Legion::PointInDomainIterator<1> pir(cell_ghost_domain); pir(); pir++) {
+#if 0
     Legion::Domain cell_all_shared_domain_inner = runtime->get_index_space_domain(ctx,
                      task->regions[11].region.get_index_space());							 
     int shared_color = 0;
@@ -830,15 +837,17 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
         break;  
   	  }
   	}
-	  printf("%d:%d ", (int)cell_ghost_id_acc[*pir], shared_color);
+#endif
+    int color = cell_ghost_color_acc.read(*pir);
+//	  printf("%d:%d:%d ", (int)cell_ghost_id_acc[*pir], shared_color, color);
 		ct ++;
-    cell_color_info.ghost_owners.insert(shared_color);
+    cell_color_info.ghost_owners.insert(color);
     
     int cell_id = (int)cell_ghost_id_acc[*pir];
     int offset = (int)cell_ghost_offset_acc[*pir];
     cells.ghost.insert(
             flecsi::coloring::entity_info_t(cell_id,
-            shared_color, offset, empty_set));
+            color, offset, empty_set));
 	}
   cell_color_info.ghost = ct;
   printf(" CG total %d\n", ct);
@@ -902,6 +911,7 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 	
 	printf("[%d, Vertex] ghost, ", my_rank);								 
   for (Legion::PointInDomainIterator<1> pir(vertex_ghost_domain); pir(); pir++) {
+#if 0
     Legion::Domain vertex_all_shared_domain_inner = runtime->get_index_space_domain(ctx,
                      task->regions[12].region.get_index_space());							 
     int shared_color = 0;
@@ -911,15 +921,17 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
         break;  
   	  }
   	}
-	  printf("%d:%d ", (int)vertex_ghost_id_acc[*pir], shared_color);
+#endif
+    int color = vertex_ghost_color_acc.read(*pir);
+	  //printf("%d:%d:%d ", (int)vertex_ghost_id_acc[*pir], shared_color, color);
 		ct ++;
-    vertex_color_info.ghost_owners.insert(shared_color);
+    vertex_color_info.ghost_owners.insert(color);
     
     int vertex_id = (int)vertex_ghost_id_acc[*pir];
     int offset = (int)vertex_ghost_offset_acc[*pir];
     vertices.ghost.insert(
             flecsi::coloring::entity_info_t(vertex_id,
-            shared_color, offset, empty_set));
+            color, offset, empty_set));
 	}
   vertex_color_info.ghost = ct;
 	printf(" VG total %d\n", ct);
@@ -961,7 +973,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 	}
   vertex_color_info.exclusive = ct;
 	printf(" VE total %d\n", ct);
-  
+
+#if 0  
   // All shared cell
 	ct = 0;
   Legion::Domain cell_all_shared_domain = runtime->get_index_space_domain(ctx,
@@ -985,7 +998,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 		ct ++;
 	}
 	printf(" VAS total %d\n", ct);
-
+#endif
+  
   std::set<size_t> cell_test = {0,1,3};
   cell_color_info.shared_users = cell_test;
   vertex_color_info.shared_users = cell_test;
@@ -996,7 +1010,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
   context_t & context_ = context_t::instance();
   context_.add_coloring(0, cells, cell_coloring_info);
   context_.add_coloring(1, vertices, vertex_coloring_info);
-//  context_.add_coloring_coloring_info(0, cell_coloring_info);
+  //context_.add_coloring_coloring(0, cells);
+  //context_.add_coloring_coloring(1, vertices);
 #if 0
 	ct = 0;
   Legion::Domain vertex_of_ghost_cell_domain = runtime->get_index_space_domain(ctx,

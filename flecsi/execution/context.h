@@ -464,6 +464,13 @@ struct context__ : public CONTEXT_POLICY {
 
     coloring_info_[index_space] = coloring_info;
   } // add_coloring
+  
+  void add_coloring_coloring(
+      size_t index_space,
+      index_coloring_t & coloring) {
+
+    colorings_[index_space] = coloring;
+  } // add_coloring
 
   /*!
     Return the index coloring referenced by key.
