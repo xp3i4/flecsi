@@ -190,7 +190,7 @@ runtime_driver(
 	MPI_Comm_size(MPI_COMM_WORLD, &num_color);
   
  
-  sleep(30);
+  //sleep(30);
   
   
 	LegionRuntime::Arrays::Rect<1> color_bound(LegionRuntime::Arrays::Point<1>(0),
@@ -626,6 +626,12 @@ runtime_driver(
 	                            READ_WRITE, EXCLUSIVE, cell_lr));
   init_entity_offset_launcher.region_requirements[0].add_field(FID_CELL_ID);
   init_entity_offset_launcher.region_requirements[0].add_field(FID_CELL_OFFSET);
+  
+	init_entity_offset_launcher.add_region_requirement(
+	  Legion::RegionRequirement(vertex_primary_lp, 0/*projection ID*/,
+	                            READ_WRITE, EXCLUSIVE, vertex_lr));
+  init_entity_offset_launcher.region_requirements[1].add_field(FID_VERTEX_ID);
+  init_entity_offset_launcher.region_requirements[1].add_field(FID_VERTEX_OFFSET);
 	
   Legion::MustEpochLauncher must_epoch_launcher_init_entity_offset;
   must_epoch_launcher_init_entity_offset.add_index_task(init_entity_offset_launcher);
@@ -657,11 +663,13 @@ runtime_driver(
 	  Legion::RegionRequirement(cell_shared_lp, 0/*projection ID*/,
 	                            READ_ONLY, EXCLUSIVE, cell_lr));
   verify_dp_launcher.region_requirements[2].add_field(FID_CELL_ID);
+  verify_dp_launcher.region_requirements[2].add_field(FID_CELL_OFFSET);
 	
 	verify_dp_launcher.add_region_requirement(
 	  Legion::RegionRequirement(cell_execlusive_lp, 0/*projection ID*/,
 	                            READ_ONLY, EXCLUSIVE, cell_lr));
   verify_dp_launcher.region_requirements[3].add_field(FID_CELL_ID);
+  verify_dp_launcher.region_requirements[3].add_field(FID_CELL_OFFSET);
 	
 	verify_dp_launcher.add_region_requirement(
 	  Legion::RegionRequirement(vertex_primary_lp, 0/*projection ID*/,
@@ -672,16 +680,19 @@ runtime_driver(
 	  Legion::RegionRequirement(vertex_ghost_lp, 0/*projection ID*/,
 	                            READ_ONLY, EXCLUSIVE, vertex_lr));
   verify_dp_launcher.region_requirements[5].add_field(FID_VERTEX_ID);
+  verify_dp_launcher.region_requirements[5].add_field(FID_VERTEX_OFFSET);
 	
 	verify_dp_launcher.add_region_requirement(
 	  Legion::RegionRequirement(vertex_shared_lp, 0/*projection ID*/,
 	                            READ_ONLY, EXCLUSIVE, vertex_lr));
   verify_dp_launcher.region_requirements[6].add_field(FID_VERTEX_ID);
+  verify_dp_launcher.region_requirements[6].add_field(FID_VERTEX_OFFSET);
 	
 	verify_dp_launcher.add_region_requirement(
 	  Legion::RegionRequirement(vertex_exclusive_lp, 0/*projection ID*/,
 	                            READ_ONLY, EXCLUSIVE, vertex_lr));
   verify_dp_launcher.region_requirements[7].add_field(FID_VERTEX_ID);
+  verify_dp_launcher.region_requirements[7].add_field(FID_VERTEX_OFFSET);
 	
 	verify_dp_launcher.add_region_requirement(
 	  Legion::RegionRequirement(vertex_of_ghost_cell_lp, 0/*projection ID*/,
