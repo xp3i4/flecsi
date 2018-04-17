@@ -840,7 +840,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 #endif
     int color = cell_ghost_color_acc.read(*pir);
 //	  printf("%d:%d:%d ", (int)cell_ghost_id_acc[*pir], shared_color, color);
-		ct ++;
+	printf("%d ", (int)cell_ghost_id_acc[*pir]);
+    ct ++;
     cell_color_info.ghost_owners.insert(color);
     
     int cell_id = (int)cell_ghost_id_acc[*pir];
@@ -924,7 +925,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
 #endif
     int color = vertex_ghost_color_acc.read(*pir);
 	  //printf("%d:%d:%d ", (int)vertex_ghost_id_acc[*pir], shared_color, color);
-		ct ++;
+	printf("%d ", (int)vertex_ghost_id_acc[*pir]);
+    ct ++;
     vertex_color_info.ghost_owners.insert(color);
     
     int vertex_id = (int)vertex_ghost_id_acc[*pir];
@@ -1012,6 +1014,8 @@ __flecsi_internal_legion_task(verify_dp_task, void) {
   context_.add_coloring(1, vertices, vertex_coloring_info);
   //context_.add_coloring_coloring(0, cells);
   //context_.add_coloring_coloring(1, vertices);
+ // context_.add_coloring_coloring_info(0, cell_coloring_info);
+//  context_.add_coloring_coloring_info(1, vertex_coloring_info);
 #if 0
 	ct = 0;
   Legion::Domain vertex_of_ghost_cell_domain = runtime->get_index_space_domain(ctx,
