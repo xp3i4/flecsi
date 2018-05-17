@@ -115,12 +115,6 @@ __flecsi_internal_legion_task(owner_pos_correction_task, void) {
 
   auto ghost_owner_pos_fid = Legion::FieldID(internal_field::ghost_owner_pos);
 
-//  LegionRuntime::Accessor::RegionAccessor<
-//      generic_type, LegionRuntime::Arrays::Point<2>>
-//      ghost_ref_acc = regions[0]
-//                          .get_field_accessor(ghost_owner_pos_fid)
-//                          .typeify<LegionRuntime::Arrays::Point<2>>();
-
    AccessorRW<LegionRuntime::Arrays::Point<2>,2>
      ghost_ref_acc(regions[0], ghost_owner_pos_fid);
 
@@ -253,12 +247,9 @@ __flecsi_internal_legion_task(owner_pos_compaction_task, void) {
 
       Legion::IndexSpace ispace =
           regions[region_idx].get_logical_region().get_index_space();
-      LegionRuntime::Accessor::RegionAccessor<
-          LegionRuntime::Accessor::AccessorType::Generic,
-          LegionRuntime::Arrays::Point<2>>
-          acc_ref = regions[region_idx]
-                        .get_field_accessor(ghost_owner_pos_fid)
-                        .typeify<LegionRuntime::Arrays::Point<2>>();
+
+      AccessorRW<LegionRuntime::Arrays::Point<2>, 2>
+        acc_ref(regions[region_idx], ghost_owner_pos_fid);
 
       Legion::Domain domain = runtime->get_index_space_domain(ctx, ispace);
       LegionRuntime::Arrays::Rect<2> rect = domain.get_rect<2>();
@@ -346,29 +337,11 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
   auto ghost_owner_pos_fid =
       LegionRuntime::HighLevel::FieldID(internal_field::ghost_owner_pos);
 
-//  auto position_ref_acc = regions[1]
-//                              .get_field_accessor(ghost_owner_pos_fid)
-//                              .typeify<LegionRuntime::Arrays::Point<2>>();
-
   AccessorRW<LegionRuntime::Arrays::Point<2>, 2>
       position_ref_acc(regions[1], ghost_owner_pos_fid);
 
-//  Legion::Domain owner_domain = runtime->get_index_space_domain(
-//      ctx, regions[0].get_logical_region().get_index_space());
-//  Legion::Domain ghost_domain = runtime->get_index_space_domain(
-//      ctx, regions[1].get_logical_region().get_index_space());
-
-//  Legion::Rect<2> owner_rect = owner_domain.get_rect<2>();
-//  Legion::Rect<2> ghost_rect = ghost_domain.get_rect<2>();
   Legion::Rect<2> owner_sub_rect;
   Legion::Rect<2> ghost_sub_rect;
-//  LegionRuntime::Accessor::ByteOffset byte_offset[2];
-
-//  LegionRuntime::Arrays::Point<2> * position_ref_data =
-//      reinterpret_cast<LegionRuntime::Arrays::Point<2> *>(
-//          position_ref_acc.template raw_rect_ptr<2>(
-//              ghost_rect, ghost_sub_rect, byte_offset));
-
 
   Legion::Rect<2> owner_rect = runtime->get_index_space_domain(ctx,
                   regions[0].get_logical_region().get_index_space());
@@ -395,15 +368,8 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
     clog_assert(fitr != iitr->second.end(), "invalid fid");
     const context_t::field_info_t & field_info = fitr->second;
 
-//    auto acc_shared = regions[0].get_field_accessor(fid);
-//    auto acc_ghost = regions[1].get_field_accessor(fid);
-
     AccessorRO<size_t, 2> acc_shared(regions[0],fid);
     AccessorRW<size_t, 2> acc_ghost(regions[1],fid);
-
-//    uint8_t * data_shared =
-//        reinterpret_cast<uint8_t *>(acc_shared.template raw_rect_ptr<2>(
-//            owner_rect, owner_sub_rect, byte_offset));
 
     const uint8_t * data_shared =
         reinterpret_cast<const uint8_t *>(acc_shared.ptr(owner_rect.lo));
@@ -416,13 +382,11 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
     }
 
     uint8_t * ghost_data =
-//        reinterpret_cast<uint8_t *>(acc_ghost.template raw_rect_ptr<2>(
-//            ghost_rect, ghost_sub_rect, byte_offset));
      reinterpret_cast<uint8_t *>(acc_ghost.ptr(ghost_rect.lo));
 
 
     for (size_t ghost_pt = 0; ghost_pt < position_max; ghost_pt++) {
-      LegionRuntime::Arrays::Point<2> ghost_ref = position_ref_data[ghost_pt];//position_ref_acc[ghost_pt];
+      LegionRuntime::Arrays::Point<2> ghost_ref = position_ref_data[ghost_pt];
 
       {
         clog_tag_guard(legion_tasks);
@@ -432,11 +396,10 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
 
       if (owner_map[ghost_ref.x[0]] == args.owner) {
         size_t owner_offset = ghost_ref.x[1] - owner_sub_rect.lo[1];
-std::cout <<"IRINA DEBUG, owner_offset="<<owner_offset<<std::endl;
 
-        const uint8_t * owner_copy_ptr = data_shared + owner_offset * field_info.size;
+        const uint8_t * owner_copy_ptr = data_shared +
+		owner_offset * field_info.size;
         size_t ghost_offset = ghost_pt;
-std::cout <<"IRINA DEBUG, ghost_offset="<<ghost_offset<<std::endl;
         uint8_t * ghost_copy_ptr = ghost_data + ghost_offset * field_info.size;
         std::memcpy(ghost_copy_ptr, owner_copy_ptr, field_info.size);
       } // if
@@ -467,25 +430,13 @@ __flecsi_internal_legion_task(owners_subregions_task, subrect_map) {
   auto ghost_owner_pos_fid =
       LegionRuntime::HighLevel::FieldID(internal_field::ghost_owner_pos);
 
-  //auto position_ref_acc = regions[0]
-  //                            .get_field_accessor(ghost_owner_pos_fid)
-  //                            .typeify<LegionRuntime::Arrays::Point<2>>();
-
   AccessorRO<LegionRuntime::Arrays::Point<2>, 2>
       position_ref_acc(regions[0], ghost_owner_pos_fid);
 
-  //Legion::Domain ghost_domain = runtime->get_index_space_domain(
-  //    ctx, regions[0].get_logical_region().get_index_space());
 
   Legion::Rect<2> ghost_rect = runtime->get_index_space_domain(
       ctx, regions[0].get_logical_region().get_index_space());
   Legion::Rect<2> ghost_sub_rect;
-  //LegionRuntime::Accessor::ByteOffset byte_offset[2];
-
-  //LegionRuntime::Arrays::Point<2> * position_ref_data =
-  //    reinterpret_cast<LegionRuntime::Arrays::Point<2> *>(
-  //        position_ref_acc.template raw_rect_ptr<2>(
-  //            ghost_rect, ghost_sub_rect, byte_offset));
 
   const LegionRuntime::Arrays::Point<2>* position_ref_data =
       reinterpret_cast<const LegionRuntime::Arrays::Point<2> *>(
