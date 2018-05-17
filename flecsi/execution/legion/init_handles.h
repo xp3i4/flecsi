@@ -39,6 +39,7 @@
 #include <flecsi/topology/mesh_types.h>
 #include <flecsi/topology/set_topology.h>
 #include <flecsi/utils/tuple_walker.h>
+#include <flecsi/execution/legion/helper.h>
 
 namespace flecsi {
 namespace execution {
@@ -107,16 +108,25 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
         Legion::LogicalRegion lr = prs[r].get_logical_region();
         Legion::IndexSpace is = lr.get_index_space();
 
-        auto ac = prs[r].get_field_accessor(h.fid).template typeify<T>();
+        Legion::Rect<2> dr = runtime->get_index_space_domain(context, is);
 
-        Legion::Domain domain = runtime->get_index_space_domain(context, is);
+        if (permissions[r]== size_t(rw)){
+          AccessorRW<T,2>ac(prs[r], h.fid);
+          data[r] =  reinterpret_cast<T * >(ac.ptr(dr.lo));
+        }
+        else if(permissions[r]== size_t(ro)){
+          AccessorRO<T,2>ac(prs[r], h.fid);
+          data[r] =  const_cast<T * >(ac.ptr(dr.lo));
+        }
+        else if(permissions[r]== size_t(wo)){
+          AccessorWO<T,2>ac(prs[r], h.fid);
+          data[r] =  reinterpret_cast<T * >(ac.ptr(dr.lo));
+        }
+        else
+          clog(fatal) << "Unrecognisez permission"
+                    << std::endl;
 
-        LegionRuntime::Arrays::Rect<2> dr = domain.get_rect<2>();
-        LegionRuntime::Arrays::Rect<2> sr;
-        LegionRuntime::Accessor::ByteOffset bo[2];
-        data[r] = ac.template raw_rect_ptr<2>(dr, sr, bo);
-        // data[r] += bo[1];
-        sizes[r] = sr.hi[1] - sr.lo[1] + 1;
+        sizes[r] = dr.hi[1] - dr.lo[1] + 1;
         h.combined_size += sizes[r];
       } // if
     } // for
