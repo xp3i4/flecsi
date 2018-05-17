@@ -467,21 +467,31 @@ __flecsi_internal_legion_task(owners_subregions_task, subrect_map) {
   auto ghost_owner_pos_fid =
       LegionRuntime::HighLevel::FieldID(internal_field::ghost_owner_pos);
 
-  auto position_ref_acc = regions[0]
-                              .get_field_accessor(ghost_owner_pos_fid)
-                              .typeify<LegionRuntime::Arrays::Point<2>>();
+  //auto position_ref_acc = regions[0]
+  //                            .get_field_accessor(ghost_owner_pos_fid)
+  //                            .typeify<LegionRuntime::Arrays::Point<2>>();
 
-  Legion::Domain ghost_domain = runtime->get_index_space_domain(
+  AccessorRO<LegionRuntime::Arrays::Point<2>, 2>
+      position_ref_acc(regions[0], ghost_owner_pos_fid);
+
+  //Legion::Domain ghost_domain = runtime->get_index_space_domain(
+  //    ctx, regions[0].get_logical_region().get_index_space());
+
+  Legion::Rect<2> ghost_rect = runtime->get_index_space_domain(
       ctx, regions[0].get_logical_region().get_index_space());
+  Legion::Rect<2> ghost_sub_rect;
+  //LegionRuntime::Accessor::ByteOffset byte_offset[2];
 
-  LegionRuntime::Arrays::Rect<2> ghost_rect = ghost_domain.get_rect<2>();
-  LegionRuntime::Arrays::Rect<2> ghost_sub_rect;
-  LegionRuntime::Accessor::ByteOffset byte_offset[2];
+  //LegionRuntime::Arrays::Point<2> * position_ref_data =
+  //    reinterpret_cast<LegionRuntime::Arrays::Point<2> *>(
+  //        position_ref_acc.template raw_rect_ptr<2>(
+  //            ghost_rect, ghost_sub_rect, byte_offset));
 
-  LegionRuntime::Arrays::Point<2> * position_ref_data =
-      reinterpret_cast<LegionRuntime::Arrays::Point<2> *>(
-          position_ref_acc.template raw_rect_ptr<2>(
-              ghost_rect, ghost_sub_rect, byte_offset));
+  const LegionRuntime::Arrays::Point<2>* position_ref_data =
+      reinterpret_cast<const LegionRuntime::Arrays::Point<2> *>(
+        position_ref_acc.ptr(ghost_rect.lo));
+
+  ghost_sub_rect = ghost_rect;
 
   size_t position_max = ghost_rect.hi[1] - ghost_rect.lo[1] + 1;
 
