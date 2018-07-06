@@ -136,7 +136,8 @@ struct FLECSI_EXPORT hpx_execution_policy_t {
   /// \param user_task_handle
   /// \param args
   ///
-  template<launch_type_t launch,size_t KEY, typename RETURN,
+  template<launch_type_t LAUNCH, size_t REDUCTION_ID,
+    size_t KEY, typename RETURN,
     typename ARG_TUPLE, typename... ARGS>
   static decltype(auto) execute_task(ARGS &&... args) {
     context_t & context_ = context_t::instance();

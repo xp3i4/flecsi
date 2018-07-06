@@ -173,7 +173,8 @@ struct mpi_execution_policy_t
    */
 
   template<
-    launch_type_t launch,
+    launch_type_t LAUNCH,
+    size_t REDUCTION_ID,
     size_t KEY,
     typename RETURN,
     typename ARG_TUPLE,

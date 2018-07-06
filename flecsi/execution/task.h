@@ -89,7 +89,7 @@ struct task_interface__ {
 
   template<
       launch_type_t LAUNCH,
-      Legion::ReductionOpID REDUCTION_ID,
+      size_t REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,

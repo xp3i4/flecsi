@@ -148,7 +148,7 @@ struct legion_execution_policy_t {
 
   template<
       launch_type_t LAUNCH,
-      Legion::ReductionOpID REDUCTION_ID,
+      size_t REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,
@@ -164,7 +164,7 @@ struct legion_execution_policy_t {
     Partial template specialization for the index launch type
    */
   template<
-   Legion::ReductionOpID REDUCTION_ID,
+     size_t REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,
@@ -324,7 +324,7 @@ struct legion_execution_policy_t {
     Partial template specialization for single task launcher
    */
   template<
-    Legion::ReductionOpID REDUCTION_ID,
+    size_t REDUCTION_ID,
     size_t KEY,
     typename RETURN,
     typename ARG_TUPLE,
@@ -404,7 +404,7 @@ struct legion_execution_policy_t {
 
   template<
       launch_type_t LAUNCH,
-      Legion::ReductionOpID REDUCTION_ID,
+      size_t REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,
