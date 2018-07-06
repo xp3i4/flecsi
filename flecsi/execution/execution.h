@@ -362,9 +362,39 @@ clog_register_tag(execution);
   /* WARNING: This macro returns a future. Don't add terminations! */          \
   flecsi::execution::task_interface_t::execute_task<                           \
       flecsi::execution::launch_type_t::launch,                                \
+      0,                                                                       \
       flecsi::utils::const_string_t{EXPAND_AND_STRINGIFY(task)}.hash(),        \
       __flecsi_internal_return_type(task),                                     \
       __flecsi_internal_arguments_type(task)>(__VA_ARGS__)
+
+/*!
+  @def flecsi_execute_task_simple
+
+  This macro executes a simple reduction user task,
+	i.e., one that is not scoped in
+  a namespace.
+
+  @param task         The user task to execute.
+  @param launch       The launch mode for the task.
+  @param reduction_id The reduction ID
+  @param ...          The arguments to pass to the user task during execution.
+
+  @ingroup execution
+ */
+
+#define flecsi_execute_reduction_task_simple(task, launch, reduction_id, ...)  \
+  /* MACRO IMPLEMENTATION */                                                   \
+                                                                               \
+  /* Execute the user task */                                                  \
+  /* WARNING: This macro returns a future. Don't add terminations! */          \
+  flecsi::execution::task_interface_t::execute_task<                           \
+      flecsi::execution::launch_type_t::launch,                                \
+      reduction_id,                                                            \
+      flecsi::utils::const_string_t{EXPAND_AND_STRINGIFY(task)}.hash(),        \
+      __flecsi_internal_return_type(task),                                     \
+      __flecsi_internal_arguments_type(task)>(__VA_ARGS__)
+
+
 
 /*!
   @def flecsi_execute_task
@@ -386,6 +416,26 @@ clog_register_tag(execution);
   flecsi_execute_task_simple(nspace::task, launch, ##__VA_ARGS__)
 
 /*!
+  @def flecsi_execute_reduction_task
+
+  This macro executes a user task.
+
+  @param task         The user task to execute.
+  @param nspace       The enclosing namespace of the task.
+  @param launch       The launch mode for the task.
+  @param reduction_id The reduction ID
+  @param ...          The arguments to pass to the user task during execution.
+
+  @ingroup execution
+ */
+#define flecsi_execute_reduction_task(task, nspace, launch, reduction_id, ...) \
+  /* MACRO IMPLEMENTATION */                                                   \
+                                                                               \
+  /* Execute the user task */                                                  \
+  flecsi_execute_reduction_task_simple(nspace::task, launch, reduction_id,     \
+           ##__VA_ARGS__)
+
+/*!
   @def flecsi_execute_mpi_task_simple
 
   This macro executes a simple MPI task, i.e., one that is not scoped
@@ -396,7 +446,6 @@ clog_register_tag(execution);
 
   @ingroup execution
  */
-
 #define flecsi_execute_mpi_task_simple(task, ...)                              \
   /* MACRO IMPLEMENTATION */                                                   \
                                                                                \

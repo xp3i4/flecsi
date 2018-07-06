@@ -147,25 +147,36 @@ struct legion_execution_policy_t {
    */
 
   template<
-      launch_type_t launch,
+      launch_type_t LAUNCH,
+      Legion::ReductionOpID REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,
       typename... ARGS>
-  struct execute_task_functor {
+  struct execute_task__ {
+
     static void execute(ARGS &&... args) {
       clog(fatal) << "invalid launch type" << std::endl;
       throw std::runtime_error("invalid launch type");
     }
   };
-
-  template<size_t KEY, typename RETURN, typename ARG_TUPLE, typename... ARGS>
-  struct execute_task_functor<
+  /*!
+    Partial template specialization for the index launch type
+   */
+  template<
+   Legion::ReductionOpID REDUCTION_ID,
+      size_t KEY,
+      typename RETURN,
+      typename ARG_TUPLE,
+      typename... ARGS>  
+  struct execute_task__<
       launch_type_t::index,
+      REDUCTION_ID,
       KEY,
       RETURN,
       ARG_TUPLE,
       ARGS...> {
+
     static decltype(auto) execute(ARG_TUPLE task_args) {
       using namespace Legion;
       // Make a tuple from the task arguments.
@@ -309,9 +320,18 @@ struct legion_execution_policy_t {
     }
   };
 
-  template<size_t KEY, typename RETURN, typename ARG_TUPLE, typename... ARGS>
-  struct execute_task_functor<
+  /*!
+    Partial template specialization for single task launcher
+   */
+  template<
+    Legion::ReductionOpID REDUCTION_ID,
+    size_t KEY,
+    typename RETURN,
+    typename ARG_TUPLE,
+    typename... ARGS>
+  struct execute_task__<
       launch_type_t::single,
+      REDUCTION_ID,
       KEY,
       RETURN,
       ARG_TUPLE,
@@ -383,7 +403,8 @@ struct legion_execution_policy_t {
   };
 
   template<
-      launch_type_t launch,
+      launch_type_t LAUNCH,
+      Legion::ReductionOpID REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,
@@ -392,8 +413,9 @@ struct legion_execution_policy_t {
 
     ARG_TUPLE task_args_tmp = std::make_tuple(args...);
 
-    return execute_task_functor<
-        launch, KEY, RETURN, ARG_TUPLE, ARGS...>::execute(task_args_tmp);
+    return execute_task__<
+        LAUNCH, REDUCTION_ID, KEY, RETURN, ARG_TUPLE, ARGS...>::execute(
+        task_args_tmp);
   } // execute_task
 
   //--------------------------------------------------------------------------//

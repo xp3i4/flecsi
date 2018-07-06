@@ -88,14 +88,15 @@ struct task_interface__ {
    */
 
   template<
-      launch_type_t launch,
+      launch_type_t LAUNCH,
+      Legion::ReductionOpID REDUCTION_ID,
       size_t KEY,
       typename RETURN,
       typename ARG_TUPLE,
       typename... ARGS>
   static decltype(auto) execute_task(ARGS &&... args) {
-    return EXECUTION_POLICY::template execute_task<
-        launch, KEY, RETURN, ARG_TUPLE>(std::forward<ARGS>(args)...);
+    return EXECUTION_POLICY::template execute_task< LAUNCH,
+        REDUCTION_ID, KEY, RETURN, ARG_TUPLE>(std::forward<ARGS>(args)...);
   } // execute_task
 
 }; // struct task_interface__
