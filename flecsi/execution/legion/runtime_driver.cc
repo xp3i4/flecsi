@@ -1005,7 +1005,7 @@ spmd_task(
     ispace_dmap[idx_space].ghost_owners_lregions
       = ghost_owners_lregions[idx_space];
 
-
+ if (context_t::instance().colors()>1){
     // Fix ghost reference/pointer to point to compacted position of
     // shared that it needs
     Legion::TaskLauncher fix_ghost_refs_launcher(context_.task_id<
@@ -1092,7 +1092,7 @@ spmd_task(
     } //owner_itr
     ispace_dmap[idx_space].ghost_owners_subregions
       = ghost_owners_subregions[idx_space];
-
+}//if
     consecutive_index++;
   } // for idx_space
   

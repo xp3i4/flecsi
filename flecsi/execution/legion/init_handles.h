@@ -81,7 +81,12 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
               GHOST_PERMISSIONS> & a) {
     auto & h = a.handle;
 
-    constexpr size_t num_regions = 3;
+  size_t num_regions;
+
+ if (context_t::instance().colors()>1)
+    num_regions = 3;
+ else 
+     num_regions = 1;
 
     h.context = context;
     h.runtime = runtime;
@@ -109,7 +114,6 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
         Legion::IndexSpace is = lr.get_index_space();
 
         Legion::Rect<2> dr = runtime->get_index_space_domain(context, is);
-
         if (permissions[r]== size_t(rw)){
           AccessorRW<T,2>ac(prs[r], h.fid);
           data[r] =  reinterpret_cast<T * >(ac.ptr(dr.lo));
