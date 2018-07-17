@@ -41,6 +41,10 @@ using subrect_map = Legion::STL::map<size_t, LegionRuntime::Arrays::Rect<2>>;
 
 clog_register_tag(legion_tasks);
 
+#define np(X)                                                            \
+ std::cout << __FILE__ << ":" << __LINE__ << ": " << __PRETTY_FUNCTION__ \
+           << ": " << #X << " = " << (X) << std::endl
+
 namespace flecsi {
 namespace execution {
 
@@ -436,8 +440,17 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
         np("-------------------------");
         for(int i = 0; i < 15; ++i){
           offset_t * owner_copy_ptr3 = shared_offsets  + i;
-          np (owner_copy_ptr3->count());              
+          //np (owner_copy_ptr3->count());  
+       //   printf("my_color %d, owner_domain size %d, fid %d, owner %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), fid, args.owner, i, owner_copy_ptr3->count());            
         }
+        
+        //const Legion::FieldAccessor<READ_ONLY,offset_t,1,Legion::coord_t, Realm::AffineAccessor<offset_t,1,Legion::coord_t> > acc_test(regions[0], fid, sizeof(offset_t));
+        for (Legion::PointInDomainIterator<2> pir(owner_domain); pir(); pir++) {
+          offset_t owner_copy_ptr4;
+          acc_shared_offsets.read_untyped(*pir, &owner_copy_ptr4, sizeof(offset_t));
+          printf("ghost copy task acc my_color %d, owner_domain size %d, lo[%d, %d], hi[%d, %d], fid %d, owner %d, ct %d\n", my_color, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1], fid, args.owner, owner_copy_ptr4.count());  
+        }
+        
       }
 
       // for (size_t ghost_pt = 0; ghost_pt < position_max; ghost_pt++) {

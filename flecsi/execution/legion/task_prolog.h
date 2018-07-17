@@ -165,6 +165,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
 
   void launch_copies() {
     auto & flecsi_context = context_t::instance();
+    
+    const int my_color = runtime->find_local_MPI_rank();
 
     // group owners by owner_regions
     std::vector<std::set<size_t>> owner_groups;
@@ -237,13 +239,20 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
           Legion::TaskArgument(&args[first], sizeof(args[first])));
 
       ghost_launcher.add_future(futures[first]);
+      
+      int my_fid = -99;
+      size_t my_owner = -99;
 
       for (auto owner_itr = owner_groups[group].begin();
            owner_itr != owner_groups[group].end(); owner_itr++) {
         size_t owner = *owner_itr;
+        
+        my_fid = fids[owner];
+        my_owner = owner;
 
         rr_shared.add_field(fids[owner]);
         rr_ghost.add_field(fids[owner]);
+        printf("mycolor %d, first %d, owner %d, task_prolog add field rr_shared %d, group %d\n", my_color, first, owner, fids[owner], group);
 
         if(sparse){
           rr_entries_shared.add_field(fids[owner] + 8192);
@@ -272,6 +281,49 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
       if(flecsi_context.color() == 2){
         // np(29);
       }
+     
+      if (my_color == 2) {
+        using offset_t = data::sparse_data_offset_t;
+        assert(my_fid != -99);
+        assert(my_owner != -99);
+        Legion::InlineLauncher valid_launcher(rr_shared);
+        assert(!(valid_launcher.requirement.flags & NO_ACCESS_FLAG));
+        Legion::PhysicalRegion valid_region = runtime->map_region(context, valid_launcher);
+        valid_region.wait_until_valid();
+        Legion::Domain owner_domain = runtime->get_index_space_domain(
+            context, valid_region.get_logical_region().get_index_space());
+        LegionRuntime::Arrays::Rect<2> owner_rect = owner_domain.get_rect<2>();
+        LegionRuntime::Arrays::Rect<2> owner_sub_rect;
+        LegionRuntime::Accessor::ByteOffset byte_offset[2];
+        
+      //  printf("task prolog fid %d, owner_domain size %d, lo[%d, %d], hi[%d, %d]\n", my_fid, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1]);
+#if 1 
+        
+        auto acc_shared_offsets = valid_region.get_field_accessor(my_fid);
+#if 0        
+        uint8_t * shared_offsets_raw =
+            reinterpret_cast<uint8_t *>(acc_shared_offsets.template raw_rect_ptr<2>(
+                owner_rect, owner_sub_rect, byte_offset));
+        offset_t * shared_offsets = reinterpret_cast<offset_t *>(shared_offsets_raw);
+        
+        for(int i = 0; i < 15; ++i){
+          offset_t * owner_copy_ptr3 = shared_offsets  + i;
+          //np (owner_copy_ptr3->count());  
+          printf("inline my_color %d, fid %d, owner %d, i %d, ct %d\n", my_color, my_fid, my_owner, i, owner_copy_ptr3->count());            
+        }
+#else
+        
+        for (Legion::PointInDomainIterator<2> pir(owner_domain); pir(); pir++) {
+          offset_t owner_copy_ptr4;
+          acc_shared_offsets.read_untyped(*pir, &owner_copy_ptr4, sizeof(offset_t));
+          printf("prolog inline my_color %d, owner_domain size %d, lo[%d, %d], hi[%d, %d], fid %d, owner %d, ct %d\n", my_color, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1], my_fid, my_owner, owner_copy_ptr4.count());   
+        }
+
+#endif        
+        runtime->unmap_region(context, valid_region);
+#endif
+      }
+
 
       // Execute the ghost copy task
       runtime->execute_task(context, ghost_launcher);
