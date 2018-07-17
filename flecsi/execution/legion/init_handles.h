@@ -565,7 +565,7 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
       Legion::LogicalRegion lr = pr.get_logical_region();
       Legion::IndexSpace is = lr.get_index_space();
 
-      auto ac = pr.get_field_accessor(h.fid).
+      auto ac = pr.get_field_accessor(h.fid + 4096).
         template typeify<sparse_field_data_t>();
 
       Legion::Domain domain = runtime->get_index_space_domain(context, is);
@@ -628,7 +628,7 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
       Legion::LogicalRegion lr = entries_prs[r].get_logical_region();
       Legion::IndexSpace is = lr.get_index_space();
 
-      auto ac = entries_prs[r].get_field_accessor(h.fid).
+      auto ac = entries_prs[r].get_field_accessor(h.fid + 8192).
         template typeify<entry_value_t>();
 
       Legion::Domain domain = runtime->get_index_space_domain(context, is);
@@ -702,7 +702,7 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
       Legion::LogicalRegion lr = pr.get_logical_region();
       Legion::IndexSpace is = lr.get_index_space();
 
-      auto ac = pr.get_field_accessor(h.fid).
+      auto ac = pr.get_field_accessor(h.fid + 4096).
         template typeify<sparse_field_data_t>();
 
       Legion::Domain domain = runtime->get_index_space_domain(context, is);
@@ -776,7 +776,7 @@ struct init_handles_t : public utils::tuple_walker__<init_handles_t> {
       Legion::LogicalRegion lr = entries_prs[r].get_logical_region();
       Legion::IndexSpace is = lr.get_index_space();
 
-      auto ac = entries_prs[r].get_field_accessor(h.fid).
+      auto ac = entries_prs[r].get_field_accessor(h.fid + 8192).
         template typeify<entry_value_t>();
 
       Legion::Domain domain = runtime->get_index_space_domain(context, is);

@@ -246,8 +246,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
         rr_ghost.add_field(fids[owner]);
 
         if(sparse){
-          rr_entries_shared.add_field(fids[owner]);
-          rr_entries_ghost.add_field(fids[owner]);
+          rr_entries_shared.add_field(fids[owner] + 8192);
+          rr_entries_ghost.add_field(fids[owner] + 8192);
         }
 
         // Phase READ
@@ -265,8 +265,12 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
       ghost_launcher.add_region_requirement(rr_ghost);
 
       if(sparse){
-        ghost_launcher.add_region_requirement(rr_entries_shared);
-        ghost_launcher.add_region_requirement(rr_entries_ghost);
+        // ghost_launcher.add_region_requirement(rr_entries_shared);
+        // ghost_launcher.add_region_requirement(rr_entries_ghost);
+      }
+
+      if(flecsi_context.color() == 2){
+        // np(29);
       }
 
       // Execute the ghost copy task
@@ -332,6 +336,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
           // offsets
           owner_regions.push_back(h.ghost_owners_offsets_lregions[owner]);
           owner_subregions.push_back(h.ghost_owners_offsets_subregions[owner]);
+          ghost_regions.push_back(h.offsets_ghost_lr);
+          color_regions.push_back(h.offsets_color_region);
 
           owner_entries_regions.push_back(
             h.ghost_owners_entries_lregions[owner]);
@@ -340,10 +346,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
             h.ghost_owners_entries_subregions[owner]);
             */
 
-          ghost_regions.push_back(h.offsets_ghost_lr);
           ghost_entries_regions.push_back(h.entries_ghost_lr);
           
-          color_regions.push_back(h.offsets_color_region);
           color_entries_regions.push_back(h.entries_color_region);
 
           fids.push_back(h.fid);

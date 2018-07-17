@@ -500,7 +500,7 @@ runtime_driver(
           if((field_info->storage_class == sparse ||
               field_info->storage_class == ragged) &&
              !utils::hash::is_internal(field_info->key)){
-            sparse_reg_req.add_field(field_info->fid);
+            sparse_reg_req.add_field(field_info->fid + 8192);
             sparse_fields=true;
           }
         }//for field_info
@@ -582,7 +582,7 @@ runtime_driver(
             if((field_info->storage_class == sparse ||
                 field_info->storage_class == ragged) &&
                !utils::hash::is_internal(field_info->key)){
-              sparse_owner_reg_req.add_field(field_info->fid);
+              sparse_owner_reg_req.add_field(field_info->fid + 8192);
               sparse_owner_fields=true;
             }
           }          
@@ -697,7 +697,7 @@ runtime_driver(
 
       for (const field_info_t & fi : context_.registered_fields()) {
         if (fi.storage_class == sparse || fi.storage_class == ragged) {
-          reg_req.add_field(fi.fid);
+          reg_req.add_field(fi.fid + 4096);
         } // if
       } // for
 
@@ -1267,6 +1267,12 @@ spmd_task(
       Legion::Domain color_domain_1D
       = Legion::Domain::from_rect<1>(color_bounds_1D);
 
+      if(my_color == 2 && idx_space == 2){
+        np(owner);
+        np(sub_rect.lo[1]);
+        np(sub_rect.hi[1]);
+      }
+
       Legion::DomainColoring owner_subrect_coloring;
       owner_subrect_coloring[SUBRECT_PART]
                              = Legion::Domain::from_rect<2>(sub_rect);
@@ -1479,7 +1485,7 @@ spmd_task(
       auto citr = cim.find(my_color);
       const coloring_info_t& ci = citr->second;
 
-      auto ac = pr.get_field_accessor(fi.fid).
+      auto ac = pr.get_field_accessor(fi.fid + 4096).
         template typeify<sparse_field_data_t>();
 
       Legion::Domain domain = runtime->get_index_space_domain(ctx, is);

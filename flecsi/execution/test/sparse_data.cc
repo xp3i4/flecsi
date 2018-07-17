@@ -139,6 +139,10 @@ void task2(client_handle_t<test_mesh_t, ro> mesh,
       }
     }
   }
+  if (rank == 2){
+    // h.dump();
+  }
+
 
 } // task2
 
@@ -239,11 +243,11 @@ void driver(int argc, char ** argv) {
   auto f1 = flecsi_execute_task_simple(task2, single, ch, ph);
   f1.wait();
 
-  auto f2 = flecsi_execute_task_simple(task3, single, ch, ph);
-  f2.wait();
+  // auto f2 = flecsi_execute_task_simple(task3, single, ch, ph);
+  // f2.wait();
 
-  auto f3 = flecsi_execute_task_simple(task2, single, ch, ph);
-  f3.wait();
+  // auto f3 = flecsi_execute_task_simple(task2, single, ch, ph);
+  // f3.wait();
 
   auto& context = execution::context_t::instance();
   if(context.color() == 0){

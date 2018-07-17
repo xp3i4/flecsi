@@ -607,7 +607,7 @@ public:
             case sparse:
               if (fi.index_space == is.index_space_id) {
                 if(!utils::hash::is_internal(fi.key)){
-                  allocator.allocate_field(fi.size + sizeof(size_t), fi.fid);
+                  allocator.allocate_field(fi.size + sizeof(size_t), fi.fid + 8192);
                 }
               }
               break;
@@ -751,7 +751,7 @@ public:
 
     for (const context_t::field_info_t & fi : context.registered_fields()) {
       if (fi.storage_class == sparse || fi.storage_class == ragged) {
-        allocator.allocate_field(sizeof(context_t::sparse_field_data_t), fi.fid);
+        allocator.allocate_field(sizeof(context_t::sparse_field_data_t), fi.fid + 4096);
       } // if
     } // for
 
