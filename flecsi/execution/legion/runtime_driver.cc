@@ -752,7 +752,7 @@ spmd_task(
   const int my_color = task->index_point.point_data[0];
   
   printf("my color %d ,pid %d\n", my_color, getpid());
-  //sleep(20);
+  sleep(20);
 
   // spmd_task is an inner task
   runtime->unmap_all_regions(ctx);

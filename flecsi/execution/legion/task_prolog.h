@@ -204,6 +204,9 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
           ghost_regions[first], WRITE_DISCARD, EXCLUSIVE, color_regions[first]);
 
 
+      Legion::RegionRequirement rr_shared_all(
+          owner_regions[first], READ_ONLY, EXCLUSIVE, owner_regions[first]);
+
       Legion::RegionRequirement rr_entries_shared;
 
       Legion::RegionRequirement rr_entries_ghost;
@@ -252,6 +255,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
 
         rr_shared.add_field(fids[owner]);
         rr_ghost.add_field(fids[owner]);
+        
+        rr_shared_all.add_field(fids[owner]);
         printf("mycolor %d, first %d, owner %d, task_prolog add field rr_shared %d, group %d\n", my_color, first, owner, fids[owner], group);
 
         if(sparse){
@@ -286,7 +291,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
         using offset_t = data::sparse_data_offset_t;
         assert(my_fid != -99);
         assert(my_owner != -99);
-        Legion::InlineLauncher valid_launcher(rr_shared);
+        
+        Legion::InlineLauncher valid_launcher(rr_shared_all);
         assert(!(valid_launcher.requirement.flags & NO_ACCESS_FLAG));
         Legion::PhysicalRegion valid_region = runtime->map_region(context, valid_launcher);
         valid_region.wait_until_valid();
@@ -312,11 +318,12 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
           printf("inline my_color %d, fid %d, owner %d, i %d, ct %d\n", my_color, my_fid, my_owner, i, owner_copy_ptr3->count());            
         }
 #else
-        
+        int iii = 0;
         for (Legion::PointInDomainIterator<2> pir(owner_domain); pir(); pir++) {
           offset_t owner_copy_ptr4;
           acc_shared_offsets.read_untyped(*pir, &owner_copy_ptr4, sizeof(offset_t));
-          printf("prolog inline my_color %d, owner_domain size %d, lo[%d, %d], hi[%d, %d], fid %d, owner %d, ct %d\n", my_color, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1], my_fid, my_owner, owner_copy_ptr4.count());   
+          printf("prolog inline my_color %d, owner_domain size %d, lo[%d, %d], hi[%d, %d], fid %d, owner %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1], my_fid, my_owner, iii, owner_copy_ptr4.count());
+          iii++;   
         }
 
 #endif        

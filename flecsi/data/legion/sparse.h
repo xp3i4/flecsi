@@ -24,6 +24,8 @@
 #include <flecsi/utils/const_string.h>
 #include <flecsi/utils/index_space.h>
 
+#include<legion.h>
+
 //----------------------------------------------------------------------------//
 //! @file
 //! @date Initial file creation: Apr 17, 2016
@@ -125,6 +127,7 @@ namespace legion {
       const data_client_t & data_client
     )
     {
+      
       static_assert(
           VERSION < utils::hash::field_max_versions,
           "max field version exceeded");
@@ -152,6 +155,9 @@ namespace legion {
       const size_t exclusive_reserve = iitr->second.exclusive_reserve;
 
       handle__<DATA_TYPE, 0, 0, 0> h;
+      
+      const int my_color = context.color();;
+      printf("in get handle %d color %d\n", index_space, my_color);
 
       h.reserve = exclusive_reserve;
       h.max_entries_per_index = max_entries_per_index;
@@ -202,6 +208,35 @@ namespace legion {
       h.index_space = index_space;
       h.data_client_hash = field_info.data_client_hash;
 
+
+      if (my_color == 2) {
+        Legion::Runtime *runtime = Legion::Runtime::get_runtime();
+        Legion::Context ctx = Legion::Runtime::get_context();
+        using offset_t = data::sparse_data_offset_t;
+        
+        
+        Legion::RegionRequirement rr_offsets_color_region(
+            h.offsets_color_region, READ_ONLY, EXCLUSIVE, h.offsets_color_region);
+        rr_offsets_color_region.add_field(h.fid);
+        Legion::InlineLauncher valid_launcher(rr_offsets_color_region);
+        assert(!(valid_launcher.requirement.flags & NO_ACCESS_FLAG));
+        Legion::PhysicalRegion valid_region = runtime->map_region(ctx, valid_launcher);
+        valid_region.wait_until_valid();
+        Legion::Domain owner_domain = runtime->get_index_space_domain(
+            ctx, valid_region.get_logical_region().get_index_space());
+        
+        auto acc_shared_offsets = valid_region.get_field_accessor(h.fid);
+        int iii = 0;
+        for (Legion::PointInDomainIterator<2> pir(owner_domain); pir(); pir++) {
+          offset_t owner_copy_ptr4;
+          acc_shared_offsets.read_untyped(*pir, &owner_copy_ptr4, sizeof(offset_t));
+          printf("get handle offsets_color_region my_color %d, owner_domain size %d, fid %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), h.fid, iii, owner_copy_ptr4.count());
+          iii++;   
+        }
+      
+        runtime->unmap_region(ctx, valid_region);
+      }
+      
       return h;
     }
 

@@ -127,6 +127,13 @@ struct finalize_handles_t : public utils::tuple_walker__<finalize_handles_t> {
     
     std::memcpy(h.offsets_data[1], h.offsets + h.num_exclusive(),
                 h.num_shared() * sizeof(offset_t));
+                
+    printf("in sparse_mutator num_shared %d\n", h.num_shared());
+    for (int ii = 0; ii < h.num_exclusive() + h.num_shared(); ii++) {
+      offset_t *ptr = h.offsets + ii;
+      printf("%d ", ptr->count());
+    }
+    printf("\n");
 
     if(!md->initialized){
       std::memcpy(h.offsets_data[2],

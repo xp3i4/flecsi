@@ -436,7 +436,7 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
       //         ghost_rect2, ghost_sub_rect2, byte_offset3));
 
 
-      if(my_color == 2){
+      if(my_color == 1){
         np("-------------------------");
         for(int i = 0; i < 15; ++i){
           offset_t * owner_copy_ptr3 = shared_offsets  + i;
