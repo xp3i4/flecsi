@@ -205,7 +205,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
 
 
       Legion::RegionRequirement rr_shared_all(
-          owner_regions[first], READ_ONLY, EXCLUSIVE, owner_regions[first]);
+          // owner_regions[first], READ_ONLY, EXCLUSIVE, owner_regions[first]);
+          offsets_shared, READ_ONLY, EXCLUSIVE, offsets_color);
 
       Legion::RegionRequirement rr_entries_shared;
 
@@ -306,7 +307,7 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
 #if 1 
         
         auto acc_shared_offsets = valid_region.get_field_accessor(my_fid);
-#if 0        
+#if 1        
         uint8_t * shared_offsets_raw =
             reinterpret_cast<uint8_t *>(acc_shared_offsets.template raw_rect_ptr<2>(
                 owner_rect, owner_sub_rect, byte_offset));
@@ -388,6 +389,9 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
             context, *(h.pbarrier_as_owner_ptr));
 
         const size_t _pbp_size = h.ghost_owners_pbarriers_ptrs.size();
+
+        offsets_shared = h.offsets_shared_lr;
+        offsets_color = h.offsets_color_region;
 
         // As user
         for (size_t owner{0}; owner < _pbp_size; owner++) {
@@ -521,6 +525,8 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
   std::vector<Legion::LogicalRegion> ghost_entries_regions;
   std::vector<Legion::LogicalRegion> color_entries_regions;
   std::vector<Legion::FieldID> fids;
+  Legion::LogicalRegion offsets_shared;
+  Legion::LogicalRegion offsets_color;
   struct ghost_copy_args {
     size_t data_client_hash;
     size_t index_space;
