@@ -156,7 +156,7 @@ namespace legion {
 
       handle__<DATA_TYPE, 0, 0, 0> h;
       
-      const int my_color = context.color();;
+      const int my_color = context.color();
       printf("in get handle %d color %d\n", index_space, my_color);
 
       h.reserve = exclusive_reserve;

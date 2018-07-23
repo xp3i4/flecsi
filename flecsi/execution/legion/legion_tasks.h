@@ -436,12 +436,12 @@ __flecsi_internal_legion_task(ghost_copy_task, void) {
       //         ghost_rect2, ghost_sub_rect2, byte_offset3));
 
 
-      if(my_color == 1){
+      if(my_color == 2){
         np("-------------------------");
         for(int i = 0; i < 15; ++i){
           offset_t * owner_copy_ptr3 = shared_offsets  + i;
           //np (owner_copy_ptr3->count());  
-       //   printf("my_color %d, owner_domain size %d, fid %d, owner %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), fid, args.owner, i, owner_copy_ptr3->count());            
+          printf("ghost_copy task raw pointer my_color %d, owner_domain size %d, fid %d, owner %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), fid, args.owner, i, owner_copy_ptr3->count());            
         }
         
         //const Legion::FieldAccessor<READ_ONLY,offset_t,1,Legion::coord_t, Realm::AffineAccessor<offset_t,1,Legion::coord_t> > acc_test(regions[0], fid, sizeof(offset_t));

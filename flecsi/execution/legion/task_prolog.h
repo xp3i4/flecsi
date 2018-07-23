@@ -206,7 +206,7 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
 
       Legion::RegionRequirement rr_shared_all(
           // owner_regions[first], READ_ONLY, EXCLUSIVE, owner_regions[first]);
-          offsets_shared, READ_ONLY, EXCLUSIVE, offsets_color);
+          offsets_color, READ_ONLY, EXCLUSIVE, offsets_color);
 
       Legion::RegionRequirement rr_entries_shared;
 
@@ -316,14 +316,14 @@ struct task_prolog_t : public utils::tuple_walker__<task_prolog_t> {
         for(int i = 0; i < 15; ++i){
           offset_t * owner_copy_ptr3 = shared_offsets  + i;
           //np (owner_copy_ptr3->count());  
-          printf("inline my_color %d, fid %d, owner %d, i %d, ct %d\n", my_color, my_fid, my_owner, i, owner_copy_ptr3->count());            
+          printf("prolog inline raw pointer my_color %d, fid %d, owner %d, i %d, ct %d\n", my_color, my_fid, my_owner, i, owner_copy_ptr3->count());            
         }
-#else
+
         int iii = 0;
         for (Legion::PointInDomainIterator<2> pir(owner_domain); pir(); pir++) {
           offset_t owner_copy_ptr4;
           acc_shared_offsets.read_untyped(*pir, &owner_copy_ptr4, sizeof(offset_t));
-          printf("prolog inline my_color %d, owner_domain size %d, lo[%d, %d], hi[%d, %d], fid %d, owner %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1], my_fid, my_owner, iii, owner_copy_ptr4.count());
+          printf("prolog inline accessor my_color %d, owner_domain size %d, lo[%d, %d], hi[%d, %d], fid %d, owner %d, i %d, ct %d\n", my_color, owner_domain.get_volume(), owner_rect.lo.x[0], owner_rect.lo.x[1], owner_rect.hi.x[0], owner_rect.hi.x[1], my_fid, my_owner, iii, owner_copy_ptr4.count());
           iii++;   
         }
 

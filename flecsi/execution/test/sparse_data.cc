@@ -237,19 +237,28 @@ void driver(int argc, char ** argv) {
 
   auto f0 = flecsi_execute_task_simple(task1, single, ch, mh);
   f0.wait();
-
+  
+  auto& context = execution::context_t::instance();
+  if(context.color() == 2){
+    printf("task 1\n");
+  }
   auto ph = flecsi_get_handle(ch, hydro, pressure, double, sparse, 0);
 
+  if(context.color() == 2){
+    printf("get handle\n");
+  }
   auto f1 = flecsi_execute_task_simple(task2, single, ch, ph);
   f1.wait();
-
+  if(context.color() == 2){
+    printf("task 2\n");
+  }
   // auto f2 = flecsi_execute_task_simple(task3, single, ch, ph);
   // f2.wait();
 
   // auto f3 = flecsi_execute_task_simple(task2, single, ch, ph);
   // f3.wait();
 
-  auto& context = execution::context_t::instance();
+//  auto& context = execution::context_t::instance();
   if(context.color() == 0){
     ASSERT_TRUE(CINCH_EQUAL_BLESSED("sparse_data.blessed"));
   }
