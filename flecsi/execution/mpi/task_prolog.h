@@ -41,7 +41,7 @@ namespace execution {
  @ingroup execution
  */
 
-struct task_prolog_t : public flecsi::utils::tuple_walker__<task_prolog_t> {
+struct task_prolog_t : public flecsi::utils::tuple_walker_u<task_prolog_t> {
 
   /*!
    Construct a task_prolog_t instance.
@@ -68,7 +68,7 @@ struct task_prolog_t : public flecsi::utils::tuple_walker__<task_prolog_t> {
     size_t EXCLUSIVE_PERMISSIONS,
     size_t SHARED_PERMISSIONS,
     size_t GHOST_PERMISSIONS>
-  void handle(dense_accessor__<
+  void handle(dense_accessor_u<
               T,
               EXCLUSIVE_PERMISSIONS,
               SHARED_PERMISSIONS,
@@ -77,7 +77,7 @@ struct task_prolog_t : public flecsi::utils::tuple_walker__<task_prolog_t> {
   } // handle
 
   template<typename T, size_t PERMISSIONS>
-  void handle(global_accessor__<T, PERMISSIONS> & a) {
+  void handle(global_accessor_u<T, PERMISSIONS> & a) {
     if (a.handle.state >= SPECIALIZATION_SPMD_INIT) {
       clog_assert(
         PERMISSIONS == size_t(ro),
@@ -141,7 +141,7 @@ struct task_prolog_t : public flecsi::utils::tuple_walker__<task_prolog_t> {
   template<typename T, size_t PERMISSIONS>
   typename std::enable_if_t<
     std::is_base_of<topology::mesh_topology_base_t, T>::value>
-  handle(data_client_handle__<T, PERMISSIONS> & h) {
+  handle(data_client_handle_u<T, PERMISSIONS> & h) {
     auto & context_ = context_t::instance();
 
     // h is partially initialized in client.h
@@ -271,7 +271,7 @@ struct task_prolog_t : public flecsi::utils::tuple_walker__<task_prolog_t> {
   template<typename T, size_t PERMISSIONS>
   typename std::enable_if_t<
     std::is_base_of<topology::set_topology_base_t, T>::value>
-  handle(data_client_handle__<T, PERMISSIONS> & h) {
+  handle(data_client_handle_u<T, PERMISSIONS> & h) {
     auto & context_ = context_t::instance();
 
     auto & ism = context_.set_index_space_map();
