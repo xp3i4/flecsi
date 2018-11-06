@@ -18,6 +18,8 @@
 #include <iostream>
 #include <vector>
 
+#include <flecsi/topology/mesh_types.h>
+
 namespace flecsi {
 namespace tutorial {
 
@@ -36,14 +38,15 @@ struct vertex_t : public flecsi::topology::mesh_entity_u<0, 1>
 
   vertex_t(point_t & p) : p_(p) {}
 
-  point_t const & coordinates() const { return p_; }
+  point_t const & coordinates() const {
+    return p_;
+  }
 
   void print(const char * string) {
     std::cout << string << " My id is " << id<0>() << std::endl;
   } // print
 
 private:
-
   point_t p_;
 
 }; // struct vertex_t
@@ -68,15 +71,12 @@ struct cell_t : public flecsi::topology::mesh_entity_u<2, 1>
     std::cout << string << " My id is " << id<0>() << std::endl;
   } // print
 
-  std::vector<size_t>
-  create_entities(
+  std::vector<size_t> create_entities(
     id_t cell_id,
     size_t dim,
     flecsi::topology::domain_connectivity_u<2> & c,
-    id_t * e
-  )
-  {
-    id_t* v = c.get_entities(cell_id, 0);
+    id_t * e) {
+    id_t * v = c.get_entities(cell_id, 0);
 
     e[0] = v[0];
     e[1] = v[2];
