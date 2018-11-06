@@ -43,8 +43,10 @@
 #define flecsi_internal_remove(...) __VA_ARGS__
 #define flecsi_internal_eat(...)
 
-#define flecsi_internal_typeof(x) flecsi_internal_detail_typeof(flecsi_internal_detail_typeof_probe x, )
-#define flecsi_internal_detail_typeof(...) flecsi_internal_detail_typeof_head(__VA_ARGS__)
+#define flecsi_internal_typeof(x)                                              \
+  flecsi_internal_detail_typeof(flecsi_internal_detail_typeof_probe x, )
+#define flecsi_internal_detail_typeof(...)                                     \
+  flecsi_internal_detail_typeof_head(__VA_ARGS__)
 #define flecsi_internal_detail_typeof_head(x, ...) flecsi_internal_remove x
 #define flecsi_internal_detail_typeof_probe(...) (__VA_ARGS__),
 
@@ -94,7 +96,7 @@
 #define reflection_variable(r, data, i, t)                                     \
                                                                                \
   /* This line adds the member data. */                                        \
-  flecsi_internal_snip(t);                                                                   \
+  flecsi_internal_snip(t);                                                     \
                                                                                \
   /* Interface for each data member. */                                        \
   template<typename S>                                                         \
@@ -105,8 +107,8 @@
     reflection_variable_u(S & self) : self_(self) {}                           \
                                                                                \
     /* Return a const reference to the variable instance. */                   \
-    typename std::add_const<flecsi_internal_typeof(t)>::type & get() const {                 \
-      return self_.flecsi_internal_strip(t);                                                 \
+    typename std::add_const<flecsi_internal_typeof(t)>::type & get() const {   \
+      return self_.flecsi_internal_strip(t);                                   \
     }                                                                          \
                                                                                \
   }; /* struct reflection_variable_u<i,S> */

@@ -53,8 +53,7 @@ tuple_visit(_Tuple && t, _Fn && f) {
   using _Indices =
     std::make_index_sequence<std::tuple_size_v<std::decay_t<_Tuple>>>;
 
-  tuple_visit_impl(
-    std::forward<_Tuple>(t), std::forward<_Fn>(f), _Indices{});
+  tuple_visit_impl(std::forward<_Tuple>(t), std::forward<_Fn>(f), _Indices{});
 }
 
 /*!
@@ -81,8 +80,7 @@ tuple_visit(_Fn && f) {
   using _Indices =
     std::make_index_sequence<std::tuple_size_v<std::decay_t<_Tuple>>>;
 
-  tuple_visit_impl(
-    std::forward<_Tuple>({}), std::forward<_Fn>(f), _Indices{});
+  tuple_visit_impl(std::forward<_Tuple>({}), std::forward<_Fn>(f), _Indices{});
 }
 
 } // namespace utils

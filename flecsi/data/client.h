@@ -403,10 +403,9 @@ struct data_client_policy_handler_u<topology::mesh_topology_u<POLICY_TYPE>> {
       }
 
       fi = context.get_field_info_from_key(
-        h.type_hash,
-        utils::hash::client_internal_field_hash(
-          const_string_t("flecsi_internal_adjacency_index").hash(),
-          NAMESPACE_HASH, NAME_HASH, hi.index_space));
+        h.type_hash, utils::hash::client_internal_field_hash(
+                       const_string_t("flecsi_internal_adjacency_index").hash(),
+                       NAMESPACE_HASH, NAME_HASH, hi.index_space));
 
       if (fi) {
         adj.index_fid = fi->fid;

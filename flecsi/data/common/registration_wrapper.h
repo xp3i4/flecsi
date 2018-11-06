@@ -128,8 +128,8 @@ struct client_registration_wrapper_u<
 
       using flecsi::utils::const_string_t;
       const size_t field_key = utils::hash::client_internal_field_hash<
-        const_string_t("flecsi_internal_entity_data").hash(),
-        NAMESPACE_HASH, NAME_HASH, INDEX_TYPE::value>();
+        const_string_t("flecsi_internal_entity_data").hash(), NAMESPACE_HASH,
+        NAME_HASH, INDEX_TYPE::value>();
 
       {
         clog_tag_guard(registration);
@@ -140,12 +140,11 @@ struct client_registration_wrapper_u<
                    << " index: " << INDEX_TYPE::value << std::endl
                    << " namespace: " << NAMESPACE_HASH << std::endl
                    << " name: " << NAME_HASH << std::endl;
-        clog(info)
-          << "new key: "
-          << utils::hash::client_internal_field_hash<
-               const_string_t("flecsi_internal_entity_data").hash(),
-               NAMESPACE_HASH, NAME_HASH, INDEX_TYPE::value>()
-          << std::endl;
+        clog(info) << "new key: "
+                   << utils::hash::client_internal_field_hash<
+                        const_string_t("flecsi_internal_entity_data").hash(),
+                        NAMESPACE_HASH, NAME_HASH, INDEX_TYPE::value>()
+                   << std::endl;
       } // scope
 
       storage_t::instance().register_field(
@@ -409,8 +408,8 @@ struct client_registration_wrapper_u<
 
       using flecsi::utils::const_string_t;
       const size_t field_key = utils::hash::client_internal_field_hash<
-        const_string_t("flecsi_internal_entity_data").hash(),
-        NAMESPACE_HASH, NAME_HASH, INDEX_TYPE::value>();
+        const_string_t("flecsi_internal_entity_data").hash(), NAMESPACE_HASH,
+        NAME_HASH, INDEX_TYPE::value>();
 
       storage_t::instance().register_field(
         type_key, field_key, wrapper_t::register_callback);
