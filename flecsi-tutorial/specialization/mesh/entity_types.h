@@ -33,8 +33,7 @@ using point_t = std::array<double, 2>;
 // Vertex type.
 //----------------------------------------------------------------------------//
 
-struct vertex_t : public flecsi::topology::mesh_entity_u<0, 1>
-{
+struct vertex_t : public flecsi::topology::mesh_entity_u<0, 1> {
 
   vertex_t(point_t & p) : p_(p) {}
 
@@ -55,16 +54,14 @@ private:
 // Edge type.
 //----------------------------------------------------------------------------//
 
-struct edge_t : public flecsi::topology::mesh_entity_u<1, 1>
-{
+struct edge_t : public flecsi::topology::mesh_entity_u<1, 1> {
 }; // struct edge_t
 
 //----------------------------------------------------------------------------//
 // Cell type.
 //----------------------------------------------------------------------------//
 
-struct cell_t : public flecsi::topology::mesh_entity_u<2, 1>
-{
+struct cell_t : public flecsi::topology::mesh_entity_u<2, 1> {
   using id_t = flecsi::utils::id_t;
 
   void print(const char * string) {
