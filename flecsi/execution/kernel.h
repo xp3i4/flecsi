@@ -43,7 +43,8 @@ namespace execution {
 //! @ingroup execution
 //----------------------------------------------------------------------------//
 
-template<typename ENTITY_TYPE,
+template<
+  typename ENTITY_TYPE,
   bool STORAGE,
   bool OWNED,
   bool SORTED,
@@ -56,7 +57,7 @@ for_each__(
   FUNCTION && function) {
   const size_t end = index_space.end_offset();
 
-  for(size_t i(index_space.begin_offset()); i < end; ++i) {
+  for (size_t i(index_space.begin_offset()); i < end; ++i) {
     function(std::forward<ENTITY_TYPE>(index_space.get_offset(i)));
   } // for
 } // for_each__
@@ -83,7 +84,8 @@ for_each__(
 //! @ingroup execution
 //----------------------------------------------------------------------------//
 
-template<typename ENTITY_TYPE,
+template<
+  typename ENTITY_TYPE,
   bool STORAGE,
   bool OWNED,
   bool SORTED,
@@ -98,7 +100,7 @@ reduce_each__(
   FUNCTION && function) {
   size_t end = index_space.end_offset();
 
-  for(size_t i(index_space.begin_offset()); i < end; ++i) {
+  for (size_t i(index_space.begin_offset()); i < end; ++i) {
     function(std::forward<ENTITY_TYPE>(index_space.get_offset(i)), reduction);
   } // for
 } // reduce_each__

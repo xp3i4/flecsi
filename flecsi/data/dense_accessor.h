@@ -51,21 +51,26 @@ struct dense_accessor_base_t {};
  @ingroup data
  */
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-struct accessor__<data::dense,
+struct accessor__<
+  data::dense,
   T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
-  GHOST_PERMISSIONS> : public accessor__<data::base,
-                         T,
-                         EXCLUSIVE_PERMISSIONS,
-                         SHARED_PERMISSIONS,
-                         GHOST_PERMISSIONS>,
-                       public dense_accessor_base_t {
-  using handle_t = dense_data_handle__<T,
+  GHOST_PERMISSIONS>
+  : public accessor__<
+      data::base,
+      T,
+      EXCLUSIVE_PERMISSIONS,
+      SHARED_PERMISSIONS,
+      GHOST_PERMISSIONS>,
+    public dense_accessor_base_t {
+  using handle_t = dense_data_handle__<
+    T,
     EXCLUSIVE_PERMISSIONS,
     SHARED_PERMISSIONS,
     GHOST_PERMISSIONS>;
@@ -241,21 +246,25 @@ struct accessor__<data::dense,
   handle_t handle;
 };
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-using dense_accessor__ = accessor__<data::dense,
+using dense_accessor__ = accessor__<
+  data::dense,
   T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
   GHOST_PERMISSIONS>;
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-using dense_accessor = dense_accessor__<T,
+using dense_accessor = dense_accessor__<
+  T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
   GHOST_PERMISSIONS>;

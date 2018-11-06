@@ -94,7 +94,8 @@ struct find_entity_ {
   using entity_types = typename MESH_TYPE::entity_types;
 
   using pair_ = typename std::tuple_element<
-    find_entity__<std::tuple_size<entity_types>::value,
+    find_entity__<
+      std::tuple_size<entity_types>::value,
       entity_types,
       DIM,
       DOM>::find() -
@@ -186,8 +187,8 @@ struct find_index_space_from_dimension__ {
     // Check match for dimension and return if matched, recurse otherwise.
     return (DIM == ELEMENT_ENTITY::dimension && DOM == ENTITY_DOMAIN::value)
              ? INDEX_SPACE::value
-             : find_index_space_from_dimension__<INDEX - 1, TUPLE, DIM,
-                 DOM>::find();
+             : find_index_space_from_dimension__<
+                 INDEX - 1, TUPLE, DIM, DOM>::find();
   } // find
 
 }; // find_index_space_from_dimension__
@@ -310,7 +311,8 @@ struct find_index_subspace_from_id__<0, TUPLE, ID> {
 //! @{
 namespace detail {
 
-template<size_t I,
+template<
+  size_t I,
   typename MESH_TYPE,
   size_t DOM,
   typename Array,
@@ -322,12 +324,13 @@ find_all_index_spaces_in_domain__(Array && index_spaces) {
     typename MESH_TYPE::entity_types, I, DOM>::find();
 }
 
-template<size_t I,
+template<
+  size_t I,
   typename MESH_TYPE,
   size_t DOM,
   typename Array,
-  typename = std::enable_if_t<(
-    I<MESH_TYPE::num_dimensions && MESH_TYPE::num_dimensions> 0)>>
+  typename = std::enable_if_t<
+    (I<MESH_TYPE::num_dimensions && MESH_TYPE::num_dimensions> 0)>>
 void
 find_all_index_spaces_in_domain__(Array && index_spaces) {
   std::forward<Array>(index_spaces)[I] = find_index_space_from_dimension__<
@@ -375,9 +378,9 @@ struct compute_connectivity__ {
     using T1 = typename std::tuple_element<2, T>::type;
     using T2 = typename std::tuple_element<3, T>::type;
 
-    if(D1::value == FIND_DOM) {
-      mesh.template compute_connectivity<FIND_DOM, T1::dimension,
-        T2::dimension>();
+    if (D1::value == FIND_DOM) {
+      mesh.template compute_connectivity<
+        FIND_DOM, T1::dimension, T2::dimension>();
     }
 
     return compute_connectivity__<FIND_DOM, I - 1, TS>::compute(mesh);
@@ -437,9 +440,9 @@ struct compute_bindings__ {
     using T1 = typename std::tuple_element<3, T>::type;
     using T2 = typename std::tuple_element<4, T>::type;
 
-    if(M1::value == FIND_DOM) {
-      mesh.template compute_bindings<M1::value, M2::value, T1::dimension,
-        T2::dimension>();
+    if (M1::value == FIND_DOM) {
+      mesh.template compute_bindings<
+        M1::value, M2::value, T1::dimension, T2::dimension>();
     } // if
 
     return compute_bindings__<FIND_DOM, I - 1, TS>::compute(mesh);
@@ -468,8 +471,7 @@ struct compute_bindings__<FIND_DOM, 0, TS> {
 }; // struct compute_bindings__
 
 template<typename T>
-class mesh_graph_partition__
-{
+class mesh_graph_partition__ {
 public:
   using int_t = T;
 
@@ -492,7 +494,8 @@ struct index_subspaces_tuple__<MESH_TYPE, false> {
 
 template<typename MESH_TYPE>
 struct get_index_subspaces__ {
-  using type = typename index_subspaces_tuple__<MESH_TYPE,
+  using type = typename index_subspaces_tuple__<
+    MESH_TYPE,
     has_member_index_subspaces<MESH_TYPE>::value>::type;
 };
 

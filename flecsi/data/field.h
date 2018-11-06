@@ -54,13 +54,14 @@ struct field_interface__ {
     @tparam INDEX_SPACE      The index space identifier.
     @tparam VERSIONS         The number of versions that shall be associated
                              with this attribute.
-    
+
     @param name The string version of the field name.
 
     @ingroup data
    */
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     size_t STORAGE_CLASS,
     typename DATA_TYPE,
     size_t NAMESPACE_HASH,
@@ -68,22 +69,23 @@ struct field_interface__ {
     size_t VERSIONS,
     size_t INDEX_SPACE = 0>
   static bool register_field(std::string const & name) {
-    static_assert(VERSIONS <= utils::hash::field_max_versions,
+    static_assert(
+      VERSIONS <= utils::hash::field_max_versions,
       "max field versions exceeded");
 
-    using wrapper_t =
-      field_registration_wrapper__<DATA_CLIENT_TYPE, STORAGE_CLASS, DATA_TYPE,
-        NAMESPACE_HASH, NAME_HASH, VERSIONS, INDEX_SPACE>;
+    using wrapper_t = field_registration_wrapper__<
+      DATA_CLIENT_TYPE, STORAGE_CLASS, DATA_TYPE, NAMESPACE_HASH, NAME_HASH,
+      VERSIONS, INDEX_SPACE>;
 
     const size_t client_type_key =
       typeid(typename DATA_CLIENT_TYPE::type_identifier_t).hash_code();
 
-    for(size_t version(0); version < VERSIONS; ++version) {
+    for (size_t version(0); version < VERSIONS; ++version) {
       const size_t key =
         utils::hash::field_hash<NAMESPACE_HASH, NAME_HASH>(version);
 
-      if(!storage_t::instance().register_field(
-           client_type_key, key, wrapper_t::register_callback)) {
+      if (!storage_t::instance().register_field(
+            client_type_key, key, wrapper_t::register_callback)) {
         return false;
       } // if
     } // for
@@ -109,7 +111,8 @@ struct field_interface__ {
     @ingroup data
    */
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     size_t STORAGE_CLASS,
     typename DATA_TYPE,
     size_t NAMESPACE_HASH,
@@ -124,8 +127,9 @@ struct field_interface__ {
     using storage_class_t =
       typename DATA_POLICY::template storage_class__<STORAGE_CLASS>;
 
-    return storage_class_t::template get_handle<DATA_CLIENT_TYPE, DATA_TYPE,
-      NAMESPACE_HASH, NAME_HASH, VERSION>(client_handle);
+    return storage_class_t::template get_handle<
+      DATA_CLIENT_TYPE, DATA_TYPE, NAMESPACE_HASH, NAME_HASH, VERSION>(
+      client_handle);
   } // get_handle
 
   /*!
@@ -146,7 +150,8 @@ struct field_interface__ {
     @ingroup data
    */
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     size_t STORAGE_CLASS,
     typename DATA_TYPE,
     size_t NAMESPACE_HASH,
@@ -162,8 +167,9 @@ struct field_interface__ {
     using storage_class_t =
       typename DATA_POLICY::template storage_class__<STORAGE_CLASS>;
 
-    return storage_class_t::template get_mutator<DATA_CLIENT_TYPE, DATA_TYPE,
-      NAMESPACE_HASH, NAME_HASH, VERSION>(client_handle, slots);
+    return storage_class_t::template get_mutator<
+      DATA_CLIENT_TYPE, DATA_TYPE, NAMESPACE_HASH, NAME_HASH, VERSION>(
+      client_handle, slots);
   } // get_mutator
 
   /*!
@@ -187,16 +193,18 @@ struct field_interface__ {
     @ingroup data
    */
 
-  template<size_t STORAGE_CLASS,
+  template<
+    size_t STORAGE_CLASS,
     typename DATA_TYPE,
     size_t NAMESPACE_HASH,
     typename PREDICATE>
-  static decltype(auto) get_handles(const data_client_t & client,
+  static decltype(auto) get_handles(
+    const data_client_t & client,
     size_t version,
     PREDICATE && predicate,
     bool sorted = true) {
-    return DATA_POLICY::template get_handles<STORAGE_CLASS, DATA_TYPE,
-      NAMESPACE_HASH, PREDICATE>(
+    return DATA_POLICY::template get_handles<
+      STORAGE_CLASS, DATA_TYPE, NAMESPACE_HASH, PREDICATE>(
       client, version, std::forward<PREDICATE>(predicate), sorted);
   } // get_handles
 
@@ -219,12 +227,14 @@ struct field_interface__ {
    */
 
   template<size_t STORAGE_CLASS, typename DATA_TYPE, typename PREDICATE>
-  static decltype(auto) get_handles(const data_client_t & client,
+  static decltype(auto) get_handles(
+    const data_client_t & client,
     size_t version,
     PREDICATE && predicate,
     bool sorted = true) {
-    return DATA_POLICY::template get_handles<STORAGE_CLASS, DATA_TYPE,
-      PREDICATE>(client, version, std::forward<PREDICATE>(predicate), sorted);
+    return DATA_POLICY::template get_handles<
+      STORAGE_CLASS, DATA_TYPE, PREDICATE>(
+      client, version, std::forward<PREDICATE>(predicate), sorted);
   } // get_handles
 
 }; // struct field_interface__

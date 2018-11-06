@@ -125,13 +125,14 @@ struct storage_class__<dense> {
     @tparam VERSION          The field version.
     @tparam PERMISSIONS      The data client permissions.
    */
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     typename DATA_TYPE,
     size_t NAMESPACE,
     size_t NAME,
     size_t VERSION>
-  static handle_t<DATA_TYPE, 0, 0, 0> get_handle(
-    const data_client_t & data_client) {
+  static handle_t<DATA_TYPE, 0, 0, 0>
+  get_handle(const data_client_t & data_client) {
     handle_t<DATA_TYPE, 0, 0, 0> h;
 
     auto & context = execution::context_t::instance();
@@ -150,9 +151,9 @@ struct storage_class__<dense> {
 
     auto & registered_field_data = context.registered_field_data();
     auto fieldDataIter = registered_field_data.find(field_info.fid);
-    if(fieldDataIter == registered_field_data.end()) {
+    if (fieldDataIter == registered_field_data.end()) {
       size_t size = field_info.size * (color_info.exclusive +
-                                        color_info.shared + color_info.ghost);
+                                       color_info.shared + color_info.ghost);
       // TODO: deal with VERSION
       context.register_field_data(field_info.fid, size);
       context.register_field_metadata<DATA_TYPE>(

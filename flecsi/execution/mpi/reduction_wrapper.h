@@ -46,7 +46,7 @@ struct reduction_wrapper__ {
     lhs_t * lhs = reinterpret_cast<lhs_t *>(inout);
     rhs_t * rhs = reinterpret_cast<rhs_t *>(in);
 
-    for(size_t i{0}; i < *len; ++i) {
+    for (size_t i{0}; i < *len; ++i) {
       TYPE::apply(lhs[i], rhs[i]);
     } // for
   } // mpi_wrapper
@@ -69,12 +69,12 @@ struct reduction_wrapper__ {
     auto & reduction_ops = context_.reduction_operations();
 
     // Check if operator has already been registered
-    clog_assert(reduction_ops.find(HASH) == reduction_ops.end(),
-      typeid(TYPE).name()
-        << " has already been registered with this name");
+    clog_assert(
+      reduction_ops.find(HASH) == reduction_ops.end(),
+      typeid(TYPE).name() << " has already been registered with this name");
 
     // Create the MPI data type if it isn't P.O.D.
-    if constexpr(!std::is_pod_v<lhs_t>) {
+    if constexpr (!std::is_pod_v<lhs_t>) {
       // Get the datatype map from the context
       auto & reduction_types = context_.reduction_types();
 
@@ -84,7 +84,7 @@ struct reduction_wrapper__ {
       // Search for this type...
       auto dtype = reduction_types.find(typehash);
 
-      if(dtype == reduction_types.end()) {
+      if (dtype == reduction_types.end()) {
         // Add the MPI type if it doesn't exist
         MPI_Datatype datatype;
         constexpr size_t datatype_size = sizeof(typename TYPE::RHS);

@@ -29,16 +29,15 @@ namespace detail {
 //! \remark If they are not, this version is instantiated.
 ////////////////////////////////////////////////////////////////////////////////
 template<typename... Ts>
-class are_integral : public std::integral_constant<bool, true>
-{};
+class are_integral : public std::integral_constant<bool, true> {};
 
 /// \brief A helper to identify if all types Ts are integral.
 //! \remark If they are, this version is instantiated.
 template<typename T, typename... Ts>
 class are_integral<T, Ts...>
-  : public std::integral_constant<bool,
-      (std::is_integral<T>::value && are_integral<Ts...>::value)>
-{};
+  : public std::integral_constant<
+      bool,
+      (std::is_integral<T>::value && are_integral<Ts...>::value)> {};
 
 //! Equal to true if Ts are all integral types.
 template<typename... Ts>
@@ -54,29 +53,31 @@ constexpr bool are_integral_v = are_integral<Ts...>::value;
 ////////////////////////////////////////////////////////////////////////////////
 
 // This function terminates the chain
-template<std::size_t I = 0,
+template<
+  std::size_t I = 0,
   typename TupleA,
   typename TupleB,
-  std::enable_if_t<std::tuple_size<TupleA>::value ==
-                     std::tuple_size<TupleB>::value &&
-                   I == std::tuple_size<TupleA>::value - 1> * = nullptr>
+  std::enable_if_t<
+    std::tuple_size<TupleA>::value == std::tuple_size<TupleB>::value &&
+    I == std::tuple_size<TupleA>::value - 1> * = nullptr>
 bool
 less_than(const TupleA & a, const TupleB & b) {
   return (std::get<I>(a) < std::get<I>(b));
 }
 
 // this function is the main one
-template<std::size_t I = 0,
+template<
+  std::size_t I = 0,
   typename TupleA,
   typename TupleB,
-  typename = std::enable_if_t<std::tuple_size<TupleA>::value ==
-                                std::tuple_size<TupleB>::value &&
-                              (I < std::tuple_size<TupleA>::value - 1) &&
-                              std::tuple_size<TupleA>::value >= 2>>
+  typename = std::enable_if_t<
+    std::tuple_size<TupleA>::value == std::tuple_size<TupleB>::value &&
+    (I < std::tuple_size<TupleA>::value - 1) &&
+    std::tuple_size<TupleA>::value >= 2>>
 bool
 less_than(const TupleA & a, const TupleB & b) {
   constexpr auto N = std::tuple_size<TupleA>::value;
-  if(std::get<I>(a) == std::get<I>(b))
+  if (std::get<I>(a) == std::get<I>(b))
     return less_than<I + 1>(a, b);
   else
     return (std::get<I>(a) < std::get<I>(b));
@@ -91,30 +92,32 @@ less_than(const TupleA & a, const TupleB & b) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // this one terminates the chain
-template<std::size_t I = 0,
+template<
+  std::size_t I = 0,
   typename TupleA,
   typename TupleB,
-  std::enable_if_t<std::tuple_size<TupleA>::value ==
-                     std::tuple_size<TupleB>::value &&
-                   I == std::tuple_size<TupleA>::value - 1> * = nullptr>
+  std::enable_if_t<
+    std::tuple_size<TupleA>::value == std::tuple_size<TupleB>::value &&
+    I == std::tuple_size<TupleA>::value - 1> * = nullptr>
 bool
 equal_to(const TupleA & a, const TupleB & b) {
   return (std::get<I>(a) == std::get<I>(b));
 }
 
 // this is the main routine
-template<std::size_t I = 0,
+template<
+  std::size_t I = 0,
   typename TupleA,
   typename TupleB,
-  typename = std::enable_if_t<std::tuple_size<TupleA>::value ==
-                                std::tuple_size<TupleB>::value &&
-                              (I < std::tuple_size<TupleA>::value - 1) &&
-                              std::tuple_size<TupleA>::value >= 2>>
+  typename = std::enable_if_t<
+    std::tuple_size<TupleA>::value == std::tuple_size<TupleB>::value &&
+    (I < std::tuple_size<TupleA>::value - 1) &&
+    std::tuple_size<TupleA>::value >= 2>>
 bool
 equal_to(const TupleA & a, const TupleB & b) {
   constexpr auto N = std::tuple_size<TupleA>::value;
   auto test = (std::get<I>(a) < std::get<I>(b));
-  if(std::get<I>(a) != std::get<I>(b))
+  if (std::get<I>(a) != std::get<I>(b))
     return false;
   else
     return equal_to<I + 1>(a, b);
@@ -129,7 +132,8 @@ equal_to(const TupleA & a, const TupleB & b) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // this routine terminates the chain
-template<std::size_t I = 0,
+template<
+  std::size_t I = 0,
   typename TupleA,
   std::enable_if_t<I == std::tuple_size<TupleA>::value - 1> * = nullptr>
 std::ostream &
@@ -139,10 +143,12 @@ print(std::ostream & output, const TupleA & a, const char *) {
 }
 
 // the main calling routine
-template<std::size_t I = 0,
+template<
+  std::size_t I = 0,
   typename TupleA,
-  typename = std::enable_if_t<(I < std::tuple_size<TupleA>::value - 1) &&
-                              std::tuple_size<TupleA>::value >= 2>>
+  typename = std::enable_if_t<
+    (I < std::tuple_size<TupleA>::value - 1) &&
+    std::tuple_size<TupleA>::value >= 2>>
 std::ostream &
 print(std::ostream & output, const TupleA & a, const char * sep) {
   output << std::get<I>(a) << sep;
@@ -181,12 +187,10 @@ struct lexical_comparison<std::tuple<Args...>> {
 ////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, typename Compare>
-class simple_id_t
-{};
+class simple_id_t {};
 
 template<template<typename> class Compare, typename... Args>
-class simple_id_t<std::tuple<Args...>, Compare<std::tuple<Args...>>>
-{
+class simple_id_t<std::tuple<Args...>, Compare<std::tuple<Args...>>> {
 
   //===========================================================================
   // Private data members
@@ -220,7 +224,8 @@ public:
   //! \param [in] ts  The different elements of the tuple
   //! \tparam Ts  The different typle types (they can differ from original
   //!             data type)
-  template<typename... Ts,
+  template<
+    typename... Ts,
     typename = std::enable_if_t<sizeof...(Ts) == sizeof...(Args)>>
   simple_id_t(Ts &&... ts) : data_{std::make_tuple(std::forward<Ts>(ts)...)} {}
 
@@ -233,8 +238,8 @@ public:
   //! \param[in,out] output  the output stream
   //! \param[in] id  the id to print
   //! \return a reference to the output stream
-  friend std::ostream & operator<<(std::ostream & output,
-    const simple_id_t & id) {
+  friend std::ostream &
+  operator<<(std::ostream & output, const simple_id_t & id) {
     detail::print(output, id.data_, ", ");
     return output;
   }

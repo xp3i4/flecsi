@@ -25,8 +25,7 @@ namespace utils {
 //! \brief iterator provides...
 //!
 template<typename C, typename T>
-class iterator
-{
+class iterator {
 public:
   using container_t = C;
   using type_t = T;

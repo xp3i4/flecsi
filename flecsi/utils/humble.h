@@ -27,7 +27,8 @@ namespace utils {
 
 // Print a diagnostic message, along with source code location
 inline void
-here_func(char const * const filename,
+here_func(
+  char const * const filename,
   char const * const fname,
   int const line,
   std::string const & s) {

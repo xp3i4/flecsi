@@ -32,8 +32,7 @@ namespace io {
 /// \tparam mesh_t Mesh to template io_base_t on.
 ///
 template<typename mesh_t>
-class io_base_t
-{
+class io_base_t {
 public:
   /// Default constructor
   io_base_t() {}

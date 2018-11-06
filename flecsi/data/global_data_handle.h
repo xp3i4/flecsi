@@ -103,7 +103,8 @@ namespace flecsi {
  */
 
 template<typename T, size_t PERMISSIONS>
-using global_data_handle__ = global_data_handle_base__<T,
+using global_data_handle__ = global_data_handle_base__<
+  T,
   PERMISSIONS,
   FLECSI_RUNTIME_GLOBAL_DATA_HANDLE_POLICY>;
 

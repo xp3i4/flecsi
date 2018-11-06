@@ -35,17 +35,16 @@ namespace utils {
  */
 
 template<typename T, size_t BITS_PER_INDEX>
-class bit_buffer__
-{
+class bit_buffer__ {
 public:
   static constexpr size_t word_bits = sizeof(T) * 8;
 
   static_assert(BITS_PER_INDEX <= word_bits, "invalid bit buffer params");
 
-  class range_proxy__
-  {
+  class range_proxy__ {
   public:
-    range_proxy__(bit_buffer__ & b,
+    range_proxy__(
+      bit_buffer__ & b,
       size_t index,
       size_t bit_start,
       size_t bit_end)
@@ -67,8 +66,7 @@ public:
     size_t bit_end_;
   };
 
-  class proxy__
-  {
+  class proxy__ {
   public:
     proxy__(bit_buffer__ & b, size_t index, size_t bit)
       : b_(b), index_(index), bit_(bit) {}
@@ -110,14 +108,13 @@ public:
     size_t i1 = (s + bit_start) / word_bits;
     size_t i2 = (s + bit_end) / word_bits;
 
-    if(i1 == i2) {
+    if (i1 == i2) {
       size_t r = (s + bit_start) % word_bits;
 
       T * v = reinterpret_cast<T *>(buffer_ + i1);
       *v &= ~(((1 << (bit_end - bit_start + 1)) - 1) << r);
       *v |= (value << r);
-    }
-    else {
+    } else {
       size_t r1 = (s + bit_start) % word_bits;
       size_t r2 = word_bits - r1 - 1;
 
@@ -146,13 +143,12 @@ public:
     size_t i1 = (s + bit_start) / word_bits;
     size_t i2 = (s + bit_end) / word_bits;
 
-    if(i1 == i2) {
+    if (i1 == i2) {
       size_t r = (s + bit_start) % word_bits;
 
       T * v = reinterpret_cast<T *>(buffer_ + i1);
       return (*v >> r) & ((1 << (bit_end - bit_start + 1)) - 1);
-    }
-    else {
+    } else {
       size_t r1 = (s + bit_start) % word_bits;
       size_t r2 = bit_end - bit_start - (word_bits - r1) + 1;
 
@@ -174,7 +170,7 @@ public:
   }
 
   void dump(size_t size) {
-    for(size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
       std::cout << i << ": " << std::bitset<word_bits>(buffer_[i]) << std::endl;
     }
   }

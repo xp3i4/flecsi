@@ -67,8 +67,7 @@ namespace utils {
  */
 
 template<typename T>
-class array_ref
-{
+class array_ref {
 
 public:
   /// \name types
@@ -125,12 +124,13 @@ public:
   /// \todo See \c basic_string_ref::substr for interface
   /// questions. We want something like this on \c array_ref, but
   /// probably not with this name.
-  constexpr array_ref substr(const size_type pos,
-    const size_type n = size_type(-1)) const {
+  constexpr array_ref
+  substr(const size_type pos, const size_type n = size_type(-1)) const {
     // Recursive implementation to satisfy constexpr.
-    return (pos > size() ? substr(size(), n)
-                         : n > size() - pos ? substr(pos, size() - pos)
-                                            : array_ref(data() + pos, n));
+    return (
+      pos > size() ? substr(size(), n)
+                   : n > size() - pos ? substr(pos, size() - pos)
+                                      : array_ref(data() + pos, n));
   }
   /// @}
 
@@ -189,7 +189,7 @@ public:
     return i >= size() ? throw std::out_of_range("at() argument out of range")
       : ptr_[i];
     */
-    if(i >= size())
+    if (i >= size())
       throw std::out_of_range("at() argument out of range");
     return ptr_[i];
   }

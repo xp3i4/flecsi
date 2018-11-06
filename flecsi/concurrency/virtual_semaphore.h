@@ -22,8 +22,7 @@ namespace flecsi {
 //!
 //! @ingroup concurrency
 //------------------------------------------------------------------------//
-class virtual_semaphore
-{
+class virtual_semaphore {
 public:
   using lock_t = std::unique_lock<std::mutex>;
 
@@ -53,15 +52,15 @@ public:
   //! Block until successfully acquiring the semaphore, i.e. count > 0.
   //---------------------------------------------------------------------//
   bool acquire() {
-    if(done_) {
+    if (done_) {
       return false;
     }
 
     lock_t lock(mutex_);
 
-    while(count_ <= 0) {
+    while (count_ <= 0) {
       cond_.wait(lock);
-      if(done_) {
+      if (done_) {
         return false;
       }
     }
@@ -76,13 +75,13 @@ public:
   //! upon success
   //---------------------------------------------------------------------//
   bool try_acquire() {
-    if(done_) {
+    if (done_) {
       return false;
     }
 
     lock_t lock(mutex_);
 
-    if(count_ > 0) {
+    if (count_ > 0) {
       --count_;
       return true;
     }
@@ -96,7 +95,7 @@ public:
   void release() {
     lock_t lock(mutex_);
 
-    if(max_count_ == 0 || count_ < max_count_) {
+    if (max_count_ == 0 || count_ < max_count_) {
       ++count_;
     }
 

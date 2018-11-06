@@ -98,7 +98,8 @@ test_boolean_interface(single) test_boolean_interface(index)
     Static launch_t creation function.
    */
 
-  template<bool SINGLE = false,
+  template<
+    bool SINGLE = false,
     bool INDEX = false,
     bool LEAF = false,
     bool INNER = false,

@@ -151,7 +151,8 @@ struct storage_class__<global> {
    Data handles.
    */
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     typename DATA_TYPE,
     size_t NAMESPACE,
     size_t NAME,
@@ -168,7 +169,7 @@ struct storage_class__<global> {
 
     auto & registered_field_data = context.registered_field_data();
     auto fieldDataIter = registered_field_data.find(field_info.fid);
-    if(fieldDataIter == registered_field_data.end()) {
+    if (fieldDataIter == registered_field_data.end()) {
       // TODO: deal with VERSION
       context.register_field_data(field_info.fid, field_info.size);
     }

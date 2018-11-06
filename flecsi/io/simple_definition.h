@@ -26,14 +26,13 @@ namespace io {
 /// \brief simple_definition_t provides a very basic implementation of
 ///        the mesh_definition_t interface.
 ///
-class simple_definition_t : public topology::mesh_definition__<2>
-{
+class simple_definition_t : public topology::mesh_definition__<2> {
 public:
   /// Default constructor
   simple_definition_t(const char * filename) {
     file_.open(filename, std::ifstream::in);
 
-    if(file_.good()) {
+    if (file_.good()) {
       std::string line;
       std::getline(file_, line);
       std::istringstream iss(line);
@@ -44,13 +43,12 @@ public:
       // Get the offset to the beginning of the vertices
       vertex_start_ = file_.tellg();
 
-      for(size_t i(0); i < num_vertices_; ++i) {
+      for (size_t i(0); i < num_vertices_; ++i) {
         std::getline(file_, line);
       } // for
 
       cell_start_ = file_.tellg();
-    }
-    else {
+    } else {
       clog_fatal("failed opening " << filename);
     } // if
   } // simple_definition_t
@@ -88,7 +86,7 @@ public:
     file_.seekg(cell_start_);
 
     // Walk to the line with the requested id.
-    for(size_t l(0); l < entity_id; ++l) {
+    for (size_t l(0); l < entity_id; ++l) {
       std::getline(file_, line);
     } // for
 
@@ -118,7 +116,7 @@ public:
     file_.seekg(vertex_start_);
 
     // Walk to the line with the requested id.
-    for(size_t l(0); l < vertex_id; ++l) {
+    for (size_t l(0); l < vertex_id; ++l) {
       std::getline(file_, line);
     } // for
 

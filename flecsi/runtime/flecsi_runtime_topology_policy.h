@@ -33,7 +33,8 @@ namespace flecsi {
 
 template<size_t NUM_DIMS, size_t NUM_DOMAINS, size_t NUM_INDEX_SUBSPACES>
 using FLECSI_RUNTIME_TOPOLOGY_STORAGE_POLICY =
-  topology::legion_topology_storage_policy_t__<NUM_DIMS,
+  topology::legion_topology_storage_policy_t__<
+    NUM_DIMS,
     NUM_DOMAINS,
     NUM_INDEX_SUBSPACES>;
 

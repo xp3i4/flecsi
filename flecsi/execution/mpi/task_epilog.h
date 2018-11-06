@@ -69,10 +69,10 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
    */
 
   template<
-      typename T,
-      size_t EXCLUSIVE_PERMISSIONS,
-      size_t SHARED_PERMISSIONS,
-      size_t GHOST_PERMISSIONS>
+    typename T,
+    size_t EXCLUSIVE_PERMISSIONS,
+    size_t SHARED_PERMISSIONS,
+    size_t GHOST_PERMISSIONS>
   void handle(dense_accessor<
               T,
               EXCLUSIVE_PERMISSIONS,
@@ -97,8 +97,8 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
 
     for (auto ghost_owner : my_coloring_info.ghost_owners) {
       MPI_Get(
-          h.ghost_data, 1, field_metadata.origin_types[ghost_owner],
-          ghost_owner, 0, 1, field_metadata.target_types[ghost_owner], win);
+        h.ghost_data, 1, field_metadata.origin_types[ghost_owner], ghost_owner,
+        0, 1, field_metadata.target_types[ghost_owner], win);
     }
 
     MPI_Win_complete(win);
@@ -116,15 +116,15 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     auto & context = context_t::instance();
     const int my_color = context.color();
     MPI_Bcast(
-        &a.data(), 1, flecsi::coloring::mpi_typetraits__<T>::type(), 0,
-        MPI_COMM_WORLD);
+      &a.data(), 1, flecsi::coloring::mpi_typetraits__<T>::type(), 0,
+      MPI_COMM_WORLD);
   } // handle
 
   template<
-      typename T,
-      size_t EXCLUSIVE_PERMISSIONS,
-      size_t SHARED_PERMISSIONS,
-      size_t GHOST_PERMISSIONS>
+    typename T,
+    size_t EXCLUSIVE_PERMISSIONS,
+    size_t SHARED_PERMISSIONS,
+    size_t GHOST_PERMISSIONS>
   void handle(sparse_accessor<
               T,
               EXCLUSIVE_PERMISSIONS,
@@ -146,7 +146,7 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     auto index_coloring = context.coloring(h.index_space);
 
     auto & sparse_field_metadata =
-        context.registered_sparse_field_metadata().at(h.fid);
+      context.registered_sparse_field_metadata().at(h.fid);
 
     entry_value_t * entries = h.entries;
     auto offsets = &(h.offsets)[0];
@@ -160,9 +160,9 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
 
     MPI_Win win;
     MPI_Win_create(
-        shared_data,
-        sizeof(entry_value_t) * h.num_shared_ * h.max_entries_per_index,
-        sizeof(entry_value_t), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
+      shared_data,
+      sizeof(entry_value_t) * h.num_shared_ * h.max_entries_per_index,
+      sizeof(entry_value_t), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
 
     MPI_Win_post(sparse_field_metadata.shared_users_grp, 0, win);
     MPI_Win_start(sparse_field_metadata.ghost_owners_grp, 0, win);
@@ -172,9 +172,9 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
       clog_rank(warn, 0) << "ghost id: " << ghost.id << ", rank: " << ghost.rank
                          << ", offset: " << ghost.offset << std::endl;
       MPI_Get(
-          &ghost_data[i * h.max_entries_per_index], h.max_entries_per_index,
-          shared_ghost_type, ghost.rank, ghost.offset * h.max_entries_per_index,
-          h.max_entries_per_index, shared_ghost_type, win);
+        &ghost_data[i * h.max_entries_per_index], h.max_entries_per_index,
+        shared_ghost_type, ghost.rank, ghost.offset * h.max_entries_per_index,
+        h.max_entries_per_index, shared_ghost_type, win);
       i++;
     }
 
@@ -199,7 +199,7 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     for (auto & shared : index_coloring.shared) {
       for (auto peer : shared.shared) {
         send_count_buf.push_back(
-            offsets[h.num_exclusive_ + shared.offset].count());
+          offsets[h.num_exclusive_ + shared.offset].count());
       }
     }
 
@@ -207,9 +207,9 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     for (auto & shared : index_coloring.shared) {
       for (auto peer : shared.shared) {
         MPI_Isend(
-            &send_count_buf[i], 1,
-            flecsi::coloring::mpi_typetraits__<uint32_t>::type(), peer,
-            shared.id, MPI_COMM_WORLD, &requests[i]);
+          &send_count_buf[i], 1,
+          flecsi::coloring::mpi_typetraits__<uint32_t>::type(), peer, shared.id,
+          MPI_COMM_WORLD, &requests[i]);
         i++;
       }
     }
@@ -219,9 +219,9 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     for (auto & ghost : index_coloring.ghost) {
       MPI_Status status;
       MPI_Irecv(
-          &recv_count_buf[i], 1,
-          flecsi::coloring::mpi_typetraits__<uint32_t>::type(), ghost.rank,
-          ghost.id, MPI_COMM_WORLD, &requests[i + send_count]);
+        &recv_count_buf[i], 1,
+        flecsi::coloring::mpi_typetraits__<uint32_t>::type(), ghost.rank,
+        ghost.id, MPI_COMM_WORLD, &requests[i + send_count]);
       i++;
     }
 
@@ -230,7 +230,7 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     for (int i = 0; i < h.num_ghost_; i++) {
       clog_rank(warn, 0) << recv_count_buf[i] << std::endl;
       offsets[h.num_exclusive_ + h.num_shared_ + i].set_count(
-          recv_count_buf[i]);
+        recv_count_buf[i]);
     }
   } // handle
 
@@ -243,14 +243,14 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     using commit_info_t = typename mutator_handle__<T>::commit_info_t;
 
     clog_assert(
-        *h.num_exclusive_insertions <= *h.reserve,
-        "sparse exclusive reserve exceed");
+      *h.num_exclusive_insertions <= *h.reserve,
+      "sparse exclusive reserve exceed");
 
     // this segfaults if we try to use a sparse mutator more than once
     // delete h.num_exclusive_insertions;
 
     entry_value_t * entries =
-        reinterpret_cast<entry_value_t *>(&(*h.entries)[0]);
+      reinterpret_cast<entry_value_t *>(&(*h.entries)[0]);
 
     commit_info_t ci;
     ci.offsets = &(*h.offsets)[0];
@@ -268,19 +268,18 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
   }
 
   template<
-      typename T,
-      size_t EXCLUSIVE_PERMISSIONS,
-      size_t SHARED_PERMISSIONS,
-      size_t GHOST_PERMISSIONS>
+    typename T,
+    size_t EXCLUSIVE_PERMISSIONS,
+    size_t SHARED_PERMISSIONS,
+    size_t GHOST_PERMISSIONS>
   void handle(ragged_accessor<
               T,
               EXCLUSIVE_PERMISSIONS,
               SHARED_PERMISSIONS,
               GHOST_PERMISSIONS> & a) {
     handle(
-        reinterpret_cast<sparse_accessor<
-            T, EXCLUSIVE_PERMISSIONS, SHARED_PERMISSIONS, GHOST_PERMISSIONS> &>(
-            a));
+      reinterpret_cast<sparse_accessor<
+        T, EXCLUSIVE_PERMISSIONS, SHARED_PERMISSIONS, GHOST_PERMISSIONS> &>(a));
   } // handle
 
   /*!
@@ -288,9 +287,9 @@ struct task_epilog_t : public flecsi::utils::tuple_walker__<task_epilog_t> {
     scalars or those that did not need any special handling.
    */
   template<typename T>
-  static typename std::enable_if_t<
-      !std::is_base_of<dense_accessor_base_t, T>::value>
-  handle(T &) {} // handle
+  static
+    typename std::enable_if_t<!std::is_base_of<dense_accessor_base_t, T>::value>
+    handle(T &) {} // handle
 
 }; // struct task_epilog_t
 

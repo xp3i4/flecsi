@@ -86,7 +86,8 @@ struct find_set_entity_ {
   using entity_types = typename SET_TYPES::entity_types;
 
   using element = typename std::tuple_element<
-    find_set_entity__<std::tuple_size<entity_types>::value,
+    find_set_entity__<
+      std::tuple_size<entity_types>::value,
       entity_types,
       FIND_INDEX_SPACE>::find() -
       1,

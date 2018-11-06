@@ -32,11 +32,10 @@ string_hash__(U && str, const T h, const std::size_t i, const std::size_t n) {
   // An unstated assumption appears to be that n is the length of str, which is
   // a string type, and that i <= n. Otherwise, we're going to have problems.
   return i == n
-    ? h
-      : string_hash__(
-        str,
-        h ^ static_cast<T>(std::forward<U>(str)[i]) << 8 * (i % 8),
-        i + 1, n);
+           ? h
+           : string_hash__(
+               str, h ^ static_cast<T>(std::forward<U>(str)[i]) << 8 * (i % 8),
+               i + 1, n);
 } // string_hash__
 
 template<typename T, typename U>
@@ -150,7 +149,8 @@ bool inline is_internal(size_t key) {
   @ingroup utils
  */
 
-template<size_t NAMESPACE,
+template<
+  size_t NAMESPACE,
   size_t NAME,
   size_t INDEX,
   size_t DOMAIN_, // FIXME: Somewhere DOMAIN is being defined
@@ -218,7 +218,8 @@ client_entity_dimension(size_t key) {
   @ingroup utils
  */
 
-template<size_t NAMESPACE,
+template<
+  size_t NAMESPACE,
   size_t NAME,
   size_t INDEX,
   size_t FROM_DOMAIN,
@@ -338,12 +339,7 @@ client_adjacency_to_dimension(size_t key) {
   @ingroup utils
  */
 
-template<
-  size_t LABEL,
-  size_t NAMESPACE,
-  size_t NAME,
-  size_t INDEX_SPACE
->
+template<size_t LABEL, size_t NAMESPACE, size_t NAME, size_t INDEX_SPACE>
 inline constexpr size_t
 client_internal_field_hash() {
   return ((LABEL ^ (NAMESPACE ^ NAME)) << 8 | INDEX_SPACE) | (1ull << 63);
@@ -370,9 +366,7 @@ client_internal_field_hash(
   size_t label,
   size_t nspace,
   size_t name,
-  size_t index_space
-)
-{
+  size_t index_space) {
   return ((label ^ (nspace ^ name)) << 8 | index_space) | (1ull << 63);
 } // client_internal_field_hash
 

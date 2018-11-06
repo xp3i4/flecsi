@@ -37,25 +37,25 @@ struct function_traits__<R (C::*)(As...)> : public function_traits__<R(As...)> {
 
 template<typename C, typename R, typename... As>
 struct function_traits__<R (C::*)(As...) const>
-    : public function_traits__<R(As...)> {
+  : public function_traits__<R(As...)> {
   using owner_type = C;
 };
 
 template<typename C, typename R, typename... As>
 struct function_traits__<R (C::*)(As...) volatile>
-    : public function_traits__<R(As...)> {
+  : public function_traits__<R(As...)> {
   using owner_type = C;
 };
 
 template<typename C, typename R, typename... As>
 struct function_traits__<R (C::*)(As...) const volatile>
-    : public function_traits__<R(As...)> {
+  : public function_traits__<R(As...)> {
   using owner_type = C;
 };
 
 template<typename R, typename... As>
 struct function_traits__<std::function<R(As...)>>
-    : public function_traits__<R(As...)> {};
+  : public function_traits__<R(As...)> {};
 
 template<typename T>
 struct function_traits__<T &> : public function_traits__<T> {};

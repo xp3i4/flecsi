@@ -62,12 +62,14 @@ struct storage__ : public STORAGE_POLICY {
     @param callback        The registration call back function.
    */
 
-  bool register_field(size_t client_type_key,
+  bool register_field(
+    size_t client_type_key,
     size_t key,
     const field_registration_function_t & callback) {
-    if(field_registry_.find(client_type_key) != field_registry_.end()) {
-      if(field_registry_[client_type_key].find(key) !=
-         field_registry_[client_type_key].end()) {
+    if (field_registry_.find(client_type_key) != field_registry_.end()) {
+      if (
+        field_registry_[client_type_key].find(key) !=
+        field_registry_[client_type_key].end()) {
         clog(warn) << "field key already exists" << std::endl;
       } // if
     } // if
@@ -100,12 +102,14 @@ struct storage__ : public STORAGE_POLICY {
     @param callback   The registration call back function.
    */
 
-  bool register_client(size_t type_hash,
+  bool register_client(
+    size_t type_hash,
     size_t key,
     const registration_function_t & callback) {
-    if(client_registry_.find(type_hash) != client_registry_.end()) {
-      clog_assert(client_registry_[type_hash].find(key) ==
-                    client_registry_[type_hash].end(),
+    if (client_registry_.find(type_hash) != client_registry_.end()) {
+      clog_assert(
+        client_registry_[type_hash].find(key) ==
+          client_registry_[type_hash].end(),
         "client key already exists");
     } // if
 
@@ -137,12 +141,14 @@ struct storage__ : public STORAGE_POLICY {
    */
 
   void assert_client_exists(size_t type_hash, size_t client_hash) {
-    clog_assert(client_registry_.find(type_hash) != client_registry_.end(),
+    clog_assert(
+      client_registry_.find(type_hash) != client_registry_.end(),
       "\nThe data_client type you are trying to access with key "
         << type_hash << " does not exist!"
         << "\nMake sure it has been properly registered!");
-    clog_assert(client_registry_[type_hash].find(client_hash) !=
-                  client_registry_[type_hash].end(),
+    clog_assert(
+      client_registry_[type_hash].find(client_hash) !=
+        client_registry_[type_hash].end(),
       "\nThe data_client instance you are trying to access with key "
         << client_hash << " does not exist!"
         << "\nMake sure it has been properly registered!");

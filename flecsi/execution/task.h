@@ -65,14 +65,15 @@ struct task_interface__ {
             the specific backend runtime being used.
    */
 
-  template<size_t KEY,
+  template<
+    size_t KEY,
     typename RETURN,
     typename ARG_TUPLE,
     RETURN (*DELEGATE)(ARG_TUPLE)>
   static decltype(auto)
   register_task(processor_type_t processor, launch_t launch, std::string name) {
-    return EXECUTION_POLICY::template register_task<KEY, RETURN, ARG_TUPLE,
-      DELEGATE>(processor, launch, name);
+    return EXECUTION_POLICY::template register_task<
+      KEY, RETURN, ARG_TUPLE, DELEGATE>(processor, launch, name);
   } // register_task
 
   /*!
@@ -88,15 +89,16 @@ struct task_interface__ {
     @param args   The arguments to pass to the user task during execution.
    */
 
-  template<launch_type_t LAUNCH,
+  template<
+    launch_type_t LAUNCH,
     size_t TASK,
     size_t REDUCTION,
     typename RETURN,
     typename ARG_TUPLE,
     typename... ARGS>
   static decltype(auto) execute_task(ARGS &&... args) {
-    return EXECUTION_POLICY::template execute_task<LAUNCH, TASK, REDUCTION,
-      RETURN, ARG_TUPLE>(std::forward<ARGS>(args)...);
+    return EXECUTION_POLICY::template execute_task<
+      LAUNCH, TASK, REDUCTION, RETURN, ARG_TUPLE>(std::forward<ARGS>(args)...);
   } // execute_task
 
   /*!

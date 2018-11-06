@@ -117,7 +117,8 @@ struct mpi_execution_policy_t {
     method please see task__::register_task.
    */
 
-  template<size_t TASK,
+  template<
+    size_t TASK,
     typename RETURN,
     typename ARG_TUPLE,
     RETURN (*DELEGATE)(ARG_TUPLE)>
@@ -132,7 +133,8 @@ struct mpi_execution_policy_t {
     please see task__::execute_task.
    */
 
-  template<launch_type_t launch,
+  template<
+    launch_type_t launch,
     size_t TASK,
     size_t REDUCTION,
     typename RETURN,
@@ -163,40 +165,40 @@ struct mpi_execution_policy_t {
     constexpr size_t ZERO =
       flecsi::utils::const_string_t{EXPAND_AND_STRINGIFY(0)}.hash();
 
-    if constexpr(REDUCTION != ZERO) {
-      
+    if constexpr (REDUCTION != ZERO) {
+
       MPI_Datatype datatype;
 
-      if constexpr(!std::is_pod_v<RETURN>) {
+      if constexpr (!std::is_pod_v<RETURN>) {
 
         size_t typehash = typeid(RETURN).hash_code();
         auto reduction_type = context_.reduction_types().find(typehash);
 
-        clog_assert(reduction_type != context_.reduction_types().end(),
+        clog_assert(
+          reduction_type != context_.reduction_types().end(),
           "invalid reduction operation");
 
         datatype = reduction_type->second;
-      }
-      else {
+      } else {
         datatype = flecsi::utils::mpi_typetraits__<RETURN>::type();
       } // if
 
       auto reduction_op = context_.reduction_operations().find(REDUCTION);
 
-      clog_assert(reduction_op != context_.reduction_operations().end(),
+      clog_assert(
+        reduction_op != context_.reduction_operations().end(),
         "invalid reduction operation");
 
       const RETURN sendbuf = future.get();
       RETURN recvbuf;
 
-      MPI_Allreduce(&sendbuf, &recvbuf, 1, datatype, reduction_op->second,
-        MPI_COMM_WORLD);
+      MPI_Allreduce(
+        &sendbuf, &recvbuf, 1, datatype, reduction_op->second, MPI_COMM_WORLD);
 
       mpi_future__<RETURN> gfuture;
       gfuture.set(recvbuf);
       return gfuture;
-    }
-    else {
+    } else {
       return future;
     } // if
   } // execute_task
@@ -227,7 +229,8 @@ struct mpi_execution_policy_t {
     method, please see function__::register_function.
    */
 
-  template<size_t FUNCTION,
+  template<
+    size_t FUNCTION,
     typename RETURN,
     typename ARG_TUPLE,
     RETURN (*DELEGATE)(ARG_TUPLE)>
@@ -243,7 +246,8 @@ struct mpi_execution_policy_t {
 
   template<typename HANDLE, typename... ARGS>
   static decltype(auto) execute_function(HANDLE & handle, ARGS &&... args) {
-    return handle(context_t::instance().function(handle.get_key()),
+    return handle(
+      context_t::instance().function(handle.get_key()),
       std::forward_as_tuple(args...));
   } // execute_function
 

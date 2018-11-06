@@ -44,22 +44,27 @@ struct ragged_accessor_base_t {};
 //! @ingroup data
 //----------------------------------------------------------------------------//
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-struct accessor__<data::ragged,
+struct accessor__<
+  data::ragged,
   T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
-  GHOST_PERMISSIONS> : public accessor__<data::sparse,
-                         T,
-                         EXCLUSIVE_PERMISSIONS,
-                         SHARED_PERMISSIONS,
-                         GHOST_PERMISSIONS>,
-                       public ragged_accessor_base_t {
+  GHOST_PERMISSIONS>
+  : public accessor__<
+      data::sparse,
+      T,
+      EXCLUSIVE_PERMISSIONS,
+      SHARED_PERMISSIONS,
+      GHOST_PERMISSIONS>,
+    public ragged_accessor_base_t {
 
-  using base_t = accessor__<data::sparse,
+  using base_t = accessor__<
+    data::sparse,
     T,
     EXCLUSIVE_PERMISSIONS,
     SHARED_PERMISSIONS,
@@ -82,21 +87,25 @@ struct accessor__<data::ragged,
   } // operator ()
 };
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-using ragged_accessor__ = accessor__<data::ragged,
+using ragged_accessor__ = accessor__<
+  data::ragged,
   T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
   GHOST_PERMISSIONS>;
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-using ragged_accessor = ragged_accessor__<T,
+using ragged_accessor = ragged_accessor__<
+  T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
   GHOST_PERMISSIONS>;

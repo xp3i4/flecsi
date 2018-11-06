@@ -23,18 +23,21 @@ namespace flecsi {
 // handle tuple walkers for type checking
 struct accessor_base_t {};
 
-template<data::storage_label_type_t,
+template<
+  data::storage_label_type_t,
   typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
 struct accessor__ : public accessor_base_t {};
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-struct accessor__<data::base,
+struct accessor__<
+  data::base,
   T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,

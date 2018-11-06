@@ -37,8 +37,7 @@ namespace flecsi {
 //----------------------------------------------------------------------------//
 
 template<typename T, typename MUTATOR_POLICY>
-class mutator_handle_base__ : public MUTATOR_POLICY
-{
+class mutator_handle_base__ : public MUTATOR_POLICY {
 public:
   using entry_value_t = data::sparse_entry_value__<T>;
 
@@ -63,7 +62,8 @@ public:
   //! Default constructor.
   //--------------------------------------------------------------------------//
 
-  mutator_handle_base__(size_t num_exclusive,
+  mutator_handle_base__(
+    size_t num_exclusive,
     size_t num_shared,
     size_t num_ghost,
     size_t max_entries_per_index,
@@ -92,7 +92,8 @@ public:
 
   ~mutator_handle_base__() {}
 
-  void init(size_t num_exclusive,
+  void init(
+    size_t num_exclusive,
     size_t num_shared,
     size_t num_ghost,
     size_t max_entries_per_index,
@@ -123,14 +124,12 @@ public:
   }
 
   size_t commit(commit_info_t * ci) {
-    if(erase_set_) {
+    if (erase_set_) {
       return commit_<true>(ci);
-    }
-    else {
-      if(ragged_changes_map_) {
+    } else {
+      if (ragged_changes_map_) {
         return raggedCommit_(ci);
-      }
-      else {
+      } else {
         return commit_<false>(ci);
       }
     }
@@ -153,7 +152,7 @@ public:
 
     size_t offset = 0;
 
-    for(size_t i = 0; i < num_exclusive_; ++i) {
+    for (size_t i = 0; i < num_exclusive_; ++i) {
       const offset_t & oi = offsets_[i];
       offset_t & coi = offsets[i];
 
@@ -168,7 +167,7 @@ public:
       eptr += num_existing;
       coi.set_offset(offset);
 
-      if(num_merged > 0) {
+      if (num_merged > 0) {
         cptr += num_merged;
         coi.set_count(num_merged);
         offset += num_merged;
@@ -186,7 +185,7 @@ public:
 
     cbuf = new entry_value_t[max_entries_per_index_];
 
-    for(size_t i = start; i < end; ++i) {
+    for (size_t i = start; i < end; ++i) {
       const offset_t & oi = offsets_[i];
       offset_t & coi = offsets[i];
 
@@ -201,7 +200,7 @@ public:
       size_t num_merged =
         merge<ERASE>(i, eptr, num_existing, sptr, used_slots, cbuf);
 
-      if(num_merged > 0) {
+      if (num_merged > 0) {
         assert(num_merged <= max_entries_per_index_);
         std::memcpy(eptr, cbuf, sizeof(entry_value_t) * num_merged);
         coi.set_count(num_merged);
@@ -219,7 +218,7 @@ public:
     delete spare_map_;
     spare_map_ = nullptr;
 
-    if(erase_set_) {
+    if (erase_set_) {
       delete erase_set_;
       erase_set_ = nullptr;
     }
@@ -235,7 +234,7 @@ public:
     entry_value_t * entries = ci->entries[0];
     offset_t * offsets = ci->offsets;
 
-    for(auto & itr : *ragged_changes_map_) {
+    for (auto & itr : *ragged_changes_map_) {
       num_exclusive_entries +=
         int64_t(itr.second.size) - int64_t(offsets[itr.first].count());
     }
@@ -247,7 +246,7 @@ public:
 
     size_t offset = 0;
 
-    for(size_t index = 0; index < num_exclusive_; ++index) {
+    for (size_t index = 0; index < num_exclusive_; ++index) {
       const offset_t & oi = offsets_[index];
       offset_t & coi = offsets[index];
 
@@ -260,16 +259,15 @@ public:
 
       ragged_changes_t * changes;
 
-      if(citr != ragged_changes_map_->end()) {
+      if (citr != ragged_changes_map_->end()) {
         changes = &citr->second;
         apply_raggged_changes(changes, cptr, eptr, num_existing);
-      }
-      else {
+      } else {
         changes = nullptr;
         std::memcpy(cptr, eptr, sizeof(entry_value_t) * num_existing);
       }
 
-      for(size_t j = 0; j < used_slots; ++j) {
+      for (size_t j = 0; j < used_slots; ++j) {
         size_t k = sptr[j].entry;
         cptr[k].entry = k;
         cptr[k].value = sptr[j].value;
@@ -278,7 +276,7 @@ public:
       auto p = spare_map_->equal_range(index);
       auto itr = p.first;
       auto itr_end = p.second;
-      while(itr != itr_end) {
+      while (itr != itr_end) {
         size_t k = itr->second.entry;
         cptr[k].entry = k;
         cptr[k].value = itr->second.value;
@@ -287,13 +285,13 @@ public:
 
       coi.set_offset(offset);
 
-      if(changes) {
+      if (changes) {
         size_t resize = changes->size;
 
-        if(changes->push_values) {
+        if (changes->push_values) {
           std::vector<T> & values = *changes->push_values;
           size_t ri = resize - values.size();
-          for(auto & vi : values) {
+          for (auto & vi : values) {
             cptr[ri].entry = ri;
             cptr[ri++].value = vi;
           }
@@ -302,8 +300,7 @@ public:
         coi.set_count(resize);
         offset += resize;
         cptr += resize;
-      }
-      else {
+      } else {
         offset += num_existing;
         cptr += num_existing;
       }
@@ -321,7 +318,7 @@ public:
 
     cbuf = new entry_value_t[max_entries_per_index_];
 
-    for(size_t index = start; index < end; ++index) {
+    for (size_t index = start; index < end; ++index) {
       entry_value_t * eptr = ci->entries[1] + max_entries_per_index_ * index;
 
       const offset_t & oi = offsets_[index];
@@ -337,16 +334,15 @@ public:
 
       ragged_changes_t * changes;
 
-      if(citr != ragged_changes_map_->end()) {
+      if (citr != ragged_changes_map_->end()) {
         changes = &citr->second;
         apply_raggged_changes(changes, cbuf, eptr, num_existing);
-      }
-      else {
+      } else {
         changes = nullptr;
         std::memcpy(cbuf, eptr, sizeof(entry_value_t) * num_existing);
       }
 
-      for(size_t j = 0; j < used_slots; ++j) {
+      for (size_t j = 0; j < used_slots; ++j) {
         size_t k = sptr[j].entry;
         cbuf[k].entry = k;
         cbuf[k].value = sptr[j].value;
@@ -355,7 +351,7 @@ public:
       auto p = spare_map_->equal_range(index);
       auto itr = p.first;
       auto itr_end = p.second;
-      while(itr != itr_end) {
+      while (itr != itr_end) {
         size_t k = itr->second.entry;
         cbuf[k].entry = k;
         cbuf[k].value = itr->second.value;
@@ -364,24 +360,24 @@ public:
 
       size_t size;
 
-      if(changes) {
+      if (changes) {
         size = changes->size;
 
-        assert(size <= max_entries_per_index_ &&
-               "ragged data: exceeded max_entries_per_index in shared/ghost");
+        assert(
+          size <= max_entries_per_index_ &&
+          "ragged data: exceeded max_entries_per_index in shared/ghost");
 
-        if(changes->push_values) {
+        if (changes->push_values) {
           std::vector<T> & values = *changes->push_values;
           size_t ri = size - values.size();
-          for(auto & vi : values) {
+          for (auto & vi : values) {
             cptr[ri].entry = ri;
             cptr[ri++].value = vi;
           }
         }
 
         coi.set_count(size);
-      }
-      else {
+      } else {
         size = num_existing;
       }
 
@@ -478,7 +474,8 @@ public:
   //--------------------------------------------------------------------------//
 
   template<bool ERASE>
-  size_t merge(size_t index,
+  size_t merge(
+    size_t index,
     entry_value_t * existing,
     size_t num_existing,
     entry_value_t * slots,
@@ -498,47 +495,45 @@ public:
     size_t slot_entry = slots < slots_end ? slots->entry : end;
     size_t existing_entry = existing < existing_end ? existing->entry : end;
 
-    for(;;) {
-      if(spare_entry < end && spare_entry <= slot_entry &&
-         spare_entry <= existing_entry) {
+    for (;;) {
+      if (
+        spare_entry < end && spare_entry <= slot_entry &&
+        spare_entry <= existing_entry) {
 
         dest->entry = spare_entry;
         dest->value = itr->second.value;
         ++dest;
 
-        while(slot_entry == spare_entry) {
+        while (slot_entry == spare_entry) {
           slot_entry = ++slots < slots_end ? slots->entry : end;
         }
 
-        while(existing_entry == slot_entry ||
-              (ERASE && erase_set_->find(std::make_pair(
-                          index, existing_entry)) != erase_set_->end())) {
+        while (existing_entry == slot_entry ||
+               (ERASE && erase_set_->find(std::make_pair(
+                           index, existing_entry)) != erase_set_->end())) {
           existing_entry = ++existing < existing_end ? existing->entry : end;
         }
 
         spare_entry = ++itr != p.second ? itr->second.entry : end;
-      }
-      else if(slot_entry < end && slot_entry <= existing_entry) {
+      } else if (slot_entry < end && slot_entry <= existing_entry) {
         dest->entry = slot_entry;
         dest->value = slots->value;
         ++dest;
 
-        while(existing_entry == slot_entry ||
-              (ERASE && erase_set_->find(std::make_pair(
-                          index, existing_entry)) != erase_set_->end())) {
+        while (existing_entry == slot_entry ||
+               (ERASE && erase_set_->find(std::make_pair(
+                           index, existing_entry)) != erase_set_->end())) {
           existing_entry = ++existing < existing_end ? existing->entry : end;
         }
 
         slot_entry = ++slots < slots_end ? slots->entry : end;
-      }
-      else if(existing_entry < end) {
+      } else if (existing_entry < end) {
         dest->entry = existing_entry;
         dest->value = existing->value;
         ++dest;
 
         existing_entry = ++existing < existing_end ? existing->entry : end;
-      }
-      else {
+      } else {
         break;
       }
     }
@@ -546,62 +541,58 @@ public:
     return dest - dest_start;
   }
 
-  void apply_raggged_changes(ragged_changes_t * changes,
+  void apply_raggged_changes(
+    ragged_changes_t * changes,
     entry_value_t * cptr,
     entry_value_t * eptr,
     size_t num_existing) {
     size_t ri = 0;
 
-    if(changes->insert_values && changes->erase_set) {
+    if (changes->insert_values && changes->erase_set) {
       auto iitr = changes->insert_values->begin();
       auto iitr_end = changes->insert_values->end();
 
       auto eitr = changes->erase_set->begin();
       auto eitr_end = changes->erase_set->end();
 
-      for(size_t j = 0; j < num_existing; ++j) {
-        if(iitr != iitr_end && iitr->first == j) {
+      for (size_t j = 0; j < num_existing; ++j) {
+        if (iitr != iitr_end && iitr->first == j) {
           std::memcpy(&cptr[ri], &iitr->second, sizeof(iitr->second));
           ++ri;
           ++iitr;
         }
 
-        if(eitr != eitr_end && *eitr == j) {
+        if (eitr != eitr_end && *eitr == j) {
           ++eitr;
-        }
-        else {
+        } else {
           cptr[ri++] = eptr[j];
         }
       }
-    }
-    else if(changes->insert_values) {
+    } else if (changes->insert_values) {
       auto iitr = changes->insert_values->begin();
       auto iitr_end = changes->insert_values->end();
 
-      for(size_t j = 0; j < num_existing; ++j) {
-        if(iitr != iitr_end && iitr->first == j) {
+      for (size_t j = 0; j < num_existing; ++j) {
+        if (iitr != iitr_end && iitr->first == j) {
           cptr[ri++].value = iitr->second;
           ++iitr;
         }
 
         cptr[ri++] = eptr[j];
       }
-    }
-    else if(changes->erase_set) {
+    } else if (changes->erase_set) {
       auto eitr = changes->erase_set->begin();
       auto eitr_end = changes->erase_set->end();
 
-      for(size_t j = 0; j < num_existing; ++j) {
-        if(eitr != eitr_end && *eitr == j) {
+      for (size_t j = 0; j < num_existing; ++j) {
+        if (eitr != eitr_end && *eitr == j) {
           ++eitr;
-        }
-        else {
+        } else {
           cptr[ri++] = eptr[j];
         }
       }
-    }
-    else {
-      for(size_t j = 0; j < num_existing; ++j) {
+    } else {
+      for (size_t j = 0; j < num_existing; ++j) {
         cptr[ri++] = eptr[j];
       }
     }

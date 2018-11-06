@@ -33,19 +33,20 @@ namespace flecsi {
 namespace execution {
 
 struct finalize_handles_t
-  : public flecsi::utils::tuple_walker__<finalize_handles_t>
-{
+  : public flecsi::utils::tuple_walker__<finalize_handles_t> {
   /*!
   Nothing needs to be done to finalize a dense data handle.
    */
-  template<typename T,
+  template<
+    typename T,
     size_t EXCLUSIVE_PERMISSIONS,
     size_t SHARED_PERMISSIONS,
     size_t GHOST_PERMISSIONS>
-  void handle(dense_data_handle__<T,
-    EXCLUSIVE_PERMISSIONS,
-    SHARED_PERMISSIONS,
-    GHOST_PERMISSIONS> & h) {} // handle
+  void handle(dense_data_handle__<
+              T,
+              EXCLUSIVE_PERMISSIONS,
+              SHARED_PERMISSIONS,
+              GHOST_PERMISSIONS> & h) {} // handle
 
   template<typename T>
   void handle(sparse_mutator<T> & m) {
@@ -77,7 +78,8 @@ struct finalize_handles_t
     MPI_Type_commit(&shared_ghost_type);
 
     MPI_Win win;
-    MPI_Win_create(shared_data,
+    MPI_Win_create(
+      shared_data,
       sizeof(entry_value_t) * h.num_shared() * h.max_entries_per_index(),
       sizeof(entry_value_t), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
 
@@ -85,13 +87,13 @@ struct finalize_handles_t
     MPI_Win_start(sparse_field_metadata.ghost_owners_grp, 0, win);
 
     int i = 0;
-    for(auto & ghost : index_coloring.ghost) {
+    for (auto & ghost : index_coloring.ghost) {
       clog_rank(warn, 0) << "ghost id: " << ghost.id << ", rank: " << ghost.rank
                          << ", offset: " << ghost.offset << std::endl;
-      MPI_Get(&ghost_data[i * h.max_entries_per_index()],
-        h.max_entries_per_index(), shared_ghost_type, ghost.rank,
-        ghost.offset * h.max_entries_per_index(), h.max_entries_per_index(),
-        shared_ghost_type, win);
+      MPI_Get(
+        &ghost_data[i * h.max_entries_per_index()], h.max_entries_per_index(),
+        shared_ghost_type, ghost.rank, ghost.offset * h.max_entries_per_index(),
+        h.max_entries_per_index(), shared_ghost_type, win);
       i++;
     }
 
@@ -105,7 +107,7 @@ struct finalize_handles_t
     //  std::endl;
 
     int send_count = 0;
-    for(auto & shared : index_coloring.shared) {
+    for (auto & shared : index_coloring.shared) {
       send_count += shared.shared.size();
     }
 
@@ -116,17 +118,18 @@ struct finalize_handles_t
     std::vector<MPI_Status> recv_status(h.num_ghost());
 
     std::vector<uint32_t> send_count_buf;
-    for(auto & shared : index_coloring.shared) {
-      for(auto peer : shared.shared) {
+    for (auto & shared : index_coloring.shared) {
+      for (auto peer : shared.shared) {
         send_count_buf.push_back(
           offsets[h.num_exclusive() + shared.offset].count());
       }
     }
 
     i = 0;
-    for(auto & shared : index_coloring.shared) {
-      for(auto peer : shared.shared) {
-        MPI_Isend(&send_count_buf[i], 1,
+    for (auto & shared : index_coloring.shared) {
+      for (auto peer : shared.shared) {
+        MPI_Isend(
+          &send_count_buf[i], 1,
           flecsi::utils::mpi_typetraits__<uint32_t>::type(), peer, 99,
           MPI_COMM_WORLD, &requests[i]);
         i++;
@@ -135,9 +138,10 @@ struct finalize_handles_t
 
     std::vector<uint32_t> recv_count_buf(h.num_ghost());
     i = 0;
-    for(auto & ghost : index_coloring.ghost) {
+    for (auto & ghost : index_coloring.ghost) {
       MPI_Status status;
-      MPI_Irecv(&recv_count_buf[i], 1,
+      MPI_Irecv(
+        &recv_count_buf[i], 1,
         flecsi::utils::mpi_typetraits__<uint32_t>::type(), ghost.rank, 99,
         MPI_COMM_WORLD, &recv_requests[i]);
       i++;
@@ -146,7 +150,7 @@ struct finalize_handles_t
     MPI_Waitall(send_count, requests.data(), statuses.data());
     MPI_Waitall(h.num_ghost(), recv_requests.data(), recv_status.data());
 
-    for(int i = 0; i < h.num_ghost(); i++) {
+    for (int i = 0; i < h.num_ghost(); i++) {
       clog_rank(warn, 0) << recv_count_buf[i] << std::endl;
       offsets[h.num_exclusive() + h.num_shared() + i].set_count(
         recv_count_buf[i]);
@@ -170,14 +174,16 @@ struct finalize_handles_t
   /*!
    No special handling is currently needed here. No-op.
    */
-  template<typename T,
+  template<
+    typename T,
     size_t EXCLUSIVE_PERMISSIONS,
     size_t SHARED_PERMISSIONS,
     size_t GHOST_PERMISSIONS>
-  void handle(ragged_accessor<T,
-    EXCLUSIVE_PERMISSIONS,
-    SHARED_PERMISSIONS,
-    GHOST_PERMISSIONS> & a) {} // handle
+  void handle(ragged_accessor<
+              T,
+              EXCLUSIVE_PERMISSIONS,
+              SHARED_PERMISSIONS,
+              GHOST_PERMISSIONS> & a) {} // handle
 
   /*!
    The finalize_handles_t type can be called to walk task args after task
@@ -190,11 +196,11 @@ struct finalize_handles_t
   typename std::enable_if_t<
     std::is_base_of<topology::mesh_topology_base_t, T>::value>
   handle(data_client_handle__<T, PERMISSIONS> & h) {
-    if(PERMISSIONS == wo || PERMISSIONS == rw) {
+    if (PERMISSIONS == wo || PERMISSIONS == rw) {
       auto & context_ = context_t::instance();
       auto & ssm = context_.index_subspace_info();
 
-      for(size_t i{0}; i < h.num_index_subspaces; ++i) {
+      for (size_t i{0}; i < h.num_index_subspaces; ++i) {
         data_client_handle_index_subspace_t & iss = h.handle_index_subspaces[i];
 
         auto itr = ssm.find(iss.index_subspace);

@@ -19,7 +19,8 @@
 
 namespace flecsi {
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS,
@@ -46,7 +47,8 @@ struct sparse_data_handle_base__ : public DATA_POLICY {
 
   sparse_data_handle_base__() {}
 
-  sparse_data_handle_base__(size_t num_exclusive,
+  sparse_data_handle_base__(
+    size_t num_exclusive,
     size_t num_shared,
     size_t num_ghost)
     : num_exclusive_(num_exclusive), num_shared_(num_shared),
@@ -110,11 +112,13 @@ namespace flecsi {
 //! @ingroup data
 //----------------------------------------------------------------------------//
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-using sparse_data_handle__ = sparse_data_handle_base__<T,
+using sparse_data_handle__ = sparse_data_handle_base__<
+  T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
   GHOST_PERMISSIONS,

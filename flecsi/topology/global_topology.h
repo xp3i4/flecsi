@@ -24,8 +24,7 @@ namespace topology {
 // Global topology.
 //----------------------------------------------------------------------------//
 
-class global_topology_base__ : public data::data_client_t
-{
+class global_topology_base__ : public data::data_client_t {
 public:
   using id_t = utils::id_t;
 };
@@ -35,8 +34,7 @@ public:
 
  @ingroup global-topology
  */
-class global_topology__ : public global_topology_base__
-{
+class global_topology__ : public global_topology_base__ {
 
 public:
   using type_identifier_t = global_topology__;

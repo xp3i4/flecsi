@@ -42,7 +42,8 @@ struct dense_data_handle_base_t {};
  @ingroup data
  */
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS,
@@ -132,11 +133,13 @@ namespace flecsi {
  @ingroup data
  */
 
-template<typename T,
+template<
+  typename T,
   size_t EXCLUSIVE_PERMISSIONS,
   size_t SHARED_PERMISSIONS,
   size_t GHOST_PERMISSIONS>
-using dense_data_handle__ = dense_data_handle_base__<T,
+using dense_data_handle__ = dense_data_handle_base__<
+  T,
   EXCLUSIVE_PERMISSIONS,
   SHARED_PERMISSIONS,
   GHOST_PERMISSIONS,

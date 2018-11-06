@@ -54,8 +54,7 @@ inline bool operator>=(const uint128 & a, const uint128 & b) noexcept;
 inline bool operator!=(const uint128 & a, const uint128 & b) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////
-class uint128
-{
+class uint128 {
 private:
   // Binary correct representation of unsigned 128bit integer
   std::uint64_t lo;
@@ -87,37 +86,37 @@ public:
       hi((std::uint64_t)(a / 18446744073709551616.0l)) {}
 
   uint128(const char * sz) noexcept : lo(0u), hi(0u) {
-    if(!sz)
+    if (!sz)
       return;
-    if(!sz[0])
+    if (!sz[0])
       return;
 
     unsigned int radix = 10;
     std::size_t i = 0;
     bool minus = false;
 
-    if(sz[i] == '-') {
+    if (sz[i] == '-') {
       ++i;
       minus = true;
     };
 
-    if(sz[i] == '0') {
+    if (sz[i] == '0') {
       radix = 8;
       ++i;
-      if(sz[i] == 'x') {
+      if (sz[i] == 'x') {
         radix = 16;
         ++i;
       };
     };
 
     std::size_t len = strlen(sz);
-    for(; i < len; ++i) {
+    for (; i < len; ++i) {
       unsigned int n = 0;
-      if(sz[i] >= '0' && sz[i] <= (std::min)(('0' + (int)radix), (int)'9'))
+      if (sz[i] >= '0' && sz[i] <= (std::min)(('0' + (int)radix), (int)'9'))
         n = sz[i] - '0';
-      else if(sz[i] >= 'a' && sz[i] <= 'a' + (int)radix - 10)
+      else if (sz[i] >= 'a' && sz[i] <= 'a' + (int)radix - 10)
         n = sz[i] - 'a' + 10;
-      else if(sz[i] >= 'A' && sz[i] <= 'A' + (int)radix - 10)
+      else if (sz[i] >= 'A' && sz[i] <= 'A' + (int)radix - 10)
         n = sz[i] - 'A' + 10;
       else
         break;
@@ -126,7 +125,7 @@ public:
       (*this) += n;
     };
 
-    if(minus)
+    if (minus)
       *this = 0u - *this;
   }
 
@@ -145,7 +144,7 @@ public:
   }
 
   uint128 operator-() const noexcept {
-    if(!this->hi && !this->lo)
+    if (!this->hi && !this->lo)
       // number is 0, just return 0
       return *this;
 
@@ -161,13 +160,13 @@ public:
 
   uint128 & operator++() {
     ++this->lo;
-    if(!this->lo)
+    if (!this->lo)
       ++this->hi;
 
     return *this;
   }
   uint128 & operator--() {
-    if(!this->lo)
+    if (!this->lo)
       --this->hi;
     --this->lo;
 
@@ -195,9 +194,9 @@ public:
     return *this;
   }
   uint128 & operator*=(const uint128 & b) noexcept {
-    if(!b)
+    if (!b)
       return *this = 0u;
-    if(b == 1u)
+    if (b == 1u)
       return *this;
 
     uint128 a = *this;
@@ -206,8 +205,8 @@ public:
     this->lo = 0ull;
     this->hi = 0ull;
 
-    for(unsigned int i = 0; i < 128; ++i) {
-      if(t.lo & 1)
+    for (unsigned int i = 0; i < 128; ++i) {
+      if (t.lo & 1)
         *this += a << i;
 
       t >>= 1;
@@ -219,19 +218,19 @@ public:
   uint128 & operator>>=(unsigned int n) noexcept {
     n &= 0x7F;
 
-    if(n > 63) {
+    if (n > 63) {
       n -= 64;
       this->lo = this->hi;
       this->hi = 0ull;
     };
 
-    if(n) {
+    if (n) {
       // shift low qword
       this->lo >>= n;
 
       // get lower N bits of high qword
       std::uint64_t mask = 0ull;
-      for(unsigned int i = 0; i < n; ++i)
+      for (unsigned int i = 0; i < n; ++i)
         mask |= (1ll << i);
 
       // and add them to low qword
@@ -246,19 +245,19 @@ public:
   uint128 & operator<<=(unsigned int n) noexcept {
     n &= 0x7F;
 
-    if(n > 63) {
+    if (n > 63) {
       n -= 64;
       this->hi = this->lo;
       this->lo = 0ull;
     };
 
-    if(n) {
+    if (n) {
       // shift high qword
       this->hi <<= n;
 
       // get higher N bits of low qword
       std::uint64_t mask = 0ull;
-      for(unsigned int i = 0; i < n; ++i)
+      for (unsigned int i = 0; i < n; ++i)
         mask |= (1ll << (63 - i));
 
       // and add them to high qword
@@ -325,9 +324,9 @@ public:
     return (std::uint64_t)this->lo;
   };
   const char * toString(unsigned int radix = 10) const noexcept {
-    if(!*this)
+    if (!*this)
       return "0";
-    if(radix < 2 || radix > 37)
+    if (radix < 2 || radix > 37)
       return "(invalid radix)";
 
     static char sz[256];
@@ -337,7 +336,7 @@ public:
     uint128 ii = *this;
     int i = 255;
 
-    while(!!ii && i) {
+    while (!!ii && i) {
       ii = ii.div(radix, r);
       sz[--i] = r.toUint() + ((r.toUint() > 9) ? 'A' - 10 : '0');
     };
@@ -357,13 +356,13 @@ public:
 
   // Arithmetic methods
   uint128 div(const uint128 & ds, uint128 & remainder) const noexcept {
-    if(!ds)
+    if (!ds)
       return 1u / (unsigned int)ds.lo;
 
     uint128 dd = *this;
 
     // only remainder
-    if(ds > dd) {
+    if (ds > dd) {
       remainder = *this;
       return std::uint64_t(0ull);
     };
@@ -373,23 +372,22 @@ public:
     //    while (dd >= ds) { dd -= ds; q += 1; }; // extreme slow version
 
     unsigned int b = 127;
-    while(r < ds) {
+    while (r < ds) {
       r <<= 1;
-      if(dd.bit(b--))
+      if (dd.bit(b--))
         r.lo |= 1;
     };
     ++b;
 
-    while(true)
-      if(r < ds) {
-        if(!(b--))
+    while (true)
+      if (r < ds) {
+        if (!(b--))
           break;
 
         r <<= 1;
-        if(dd.bit(b))
+        if (dd.bit(b))
           r.lo |= 1;
-      }
-      else {
+      } else {
         r -= ds;
         q.bit(b, true);
       };
@@ -402,7 +400,7 @@ public:
   bool bit(unsigned int n) const noexcept {
     n &= 0x7F;
 
-    if(n < 64)
+    if (n < 64)
       return (this->lo & (1ull << n)) ? true : false;
 
     return (this->hi & (1ull << (n - 64))) ? true : false;
@@ -410,14 +408,13 @@ public:
   void bit(unsigned int n, bool val) noexcept {
     n &= 0x7F;
 
-    if(val) {
-      if(n < 64)
+    if (val) {
+      if (n < 64)
         this->lo |= (1ull << n);
       else
         this->hi |= (1ull << (n - 64));
-    }
-    else {
-      if(n < 64)
+    } else {
+      if (n < 64)
         this->lo &= ~(1ull << n);
       else
         this->hi &= ~(1ull << (n - 64));

@@ -142,7 +142,7 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
   }; // struct entity_info_t
 
   struct entity_walker_t
-      : public flecsi::utils::tuple_walker__<entity_walker_t> {
+    : public flecsi::utils::tuple_walker__<entity_walker_t> {
 
     template<typename TUPLE_ENTRY_TYPE>
     void handle_type() {
@@ -172,7 +172,7 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
   template<typename MESH_TYPE>
   struct connectivity_walker__
-      : public flecsi::utils::tuple_walker__<connectivity_walker__<MESH_TYPE>> {
+    : public flecsi::utils::tuple_walker__<connectivity_walker__<MESH_TYPE>> {
     using entity_types_t = typename MESH_TYPE::entity_types;
 
     template<typename TUPLE_ENTRY_TYPE>
@@ -189,13 +189,13 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
       hi.index_space = INDEX_TYPE::value;
 
-      hi.from_index_space =
-        topology::find_index_space__<std::tuple_size<entity_types_t>::value,
-          entity_types_t, FROM_ENTITY_TYPE>::find();
+      hi.from_index_space = topology::find_index_space__<
+        std::tuple_size<entity_types_t>::value, entity_types_t,
+        FROM_ENTITY_TYPE>::find();
 
-      hi.to_index_space =
-        topology::find_index_space__<std::tuple_size<entity_types_t>::value,
-          entity_types_t, TO_ENTITY_TYPE>::find();
+      hi.to_index_space = topology::find_index_space__<
+        std::tuple_size<entity_types_t>::value, entity_types_t,
+        TO_ENTITY_TYPE>::find();
 
       hi.from_domain = DOMAIN_TYPE::value;
 
@@ -214,7 +214,7 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
   template<typename MESH_TYPE>
   struct binding_walker__
-      : public flecsi::utils::tuple_walker__<binding_walker__<MESH_TYPE>> {
+    : public flecsi::utils::tuple_walker__<binding_walker__<MESH_TYPE>> {
     using entity_types_t = typename MESH_TYPE::entity_types;
 
     template<typename TUPLE_ENTRY_TYPE>
@@ -233,13 +233,13 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
       hi.index_space = INDEX_TYPE::value;
 
-      hi.from_index_space =
-        topology::find_index_space__<std::tuple_size<entity_types_t>::value,
-          entity_types_t, FROM_ENTITY_TYPE>::find();
+      hi.from_index_space = topology::find_index_space__<
+        std::tuple_size<entity_types_t>::value, entity_types_t,
+        FROM_ENTITY_TYPE>::find();
 
-      hi.to_index_space =
-        topology::find_index_space__<std::tuple_size<entity_types_t>::value,
-          entity_types_t, TO_ENTITY_TYPE>::find();
+      hi.to_index_space = topology::find_index_space__<
+        std::tuple_size<entity_types_t>::value, entity_types_t,
+        TO_ENTITY_TYPE>::find();
 
       hi.from_domain = FROM_DOMAIN_TYPE::value;
 
@@ -256,8 +256,8 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
   }; // struct binding_walker__
 
   template<typename MESH_TYPE>
-  struct index_subspace_walker__ : public flecsi::utils::tuple_walker__<
-                                       index_subspace_walker__<MESH_TYPE>> {
+  struct index_subspace_walker__
+    : public flecsi::utils::tuple_walker__<index_subspace_walker__<MESH_TYPE>> {
 
     using entity_types_t = typename MESH_TYPE::entity_types;
 
@@ -327,7 +327,7 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
     using flecsi::utils::const_string_t;
     size_t entity_index(0);
-    for(auto & ei : entity_walker.entity_info) {
+    for (auto & ei : entity_walker.entity_info) {
       data_client_handle_entity_t & ent = h.handle_entities[entity_index];
       ent.index_space = ei.index_space;
       ent.domain = ei.domain;
@@ -335,30 +335,20 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
       ent.size = ei.size;
 
       const field_info_t * fi = context.get_field_info_from_key(
-        h.type_hash,
-        utils::hash::client_internal_field_hash(
-          const_string_t("__flecsi_internal_entity_data__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          ent.index_space
-        )
-      );
+        h.type_hash, utils::hash::client_internal_field_hash(
+                       const_string_t("__flecsi_internal_entity_data__").hash(),
+                       NAMESPACE_HASH, NAME_HASH, ent.index_space));
 
-      if(fi) {
+      if (fi) {
         ent.fid = fi->fid;
       }
 
       fi = context.get_field_info_from_key(
-        h.type_hash,
-        utils::hash::client_internal_field_hash(
-          const_string_t("__flecsi_internal_entity_id__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          ent.index_space
-        )
-      );
+        h.type_hash, utils::hash::client_internal_field_hash(
+                       const_string_t("__flecsi_internal_entity_id__").hash(),
+                       NAMESPACE_HASH, NAME_HASH, ent.index_space));
 
-      if(fi) {
+      if (fi) {
         ent.id_fid = fi->fid;
       }
 
@@ -385,12 +375,13 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
     size_t handle_index = 0;
 
-    clog_assert(binding_walker.adjacency_info.size() <= h.MAX_ADJACENCIES,
+    clog_assert(
+      binding_walker.adjacency_info.size() <= h.MAX_ADJACENCIES,
       "handle max adjacencies exceeded");
 
     h.num_handle_adjacencies = binding_walker.adjacency_info.size();
 
-    for(adjacency_info_t & hi : binding_walker.adjacency_info) {
+    for (adjacency_info_t & hi : binding_walker.adjacency_info) {
       data_client_handle_adjacency_t & adj = h.handle_adjacencies[handle_index];
 
       adj.adj_index_space = hi.index_space;
@@ -405,13 +396,9 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
         h.type_hash,
         utils::hash::client_internal_field_hash(
           const_string_t("__flecsi_internal_adjacency_offset__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          hi.index_space
-        )
-      );
+          NAMESPACE_HASH, NAME_HASH, hi.index_space));
 
-      if(fi) {
+      if (fi) {
         adj.offset_fid = fi->fid;
       }
 
@@ -419,13 +406,9 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
         h.type_hash,
         utils::hash::client_internal_field_hash(
           const_string_t("__flecsi_internal_adjacency_index__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          hi.index_space
-        )
-      );
+          NAMESPACE_HASH, NAME_HASH, hi.index_space));
 
-      if(fi) {
+      if (fi) {
         adj.index_fid = fi->fid;
       }
 
@@ -455,8 +438,8 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
 
     h.num_index_subspaces = index_subspace_walker.index_subspace_info.size();
 
-    for(index_subspace_info_t & si :
-      index_subspace_walker.index_subspace_info) {
+    for (index_subspace_info_t & si :
+         index_subspace_walker.index_subspace_info) {
 
       data_client_handle_index_subspace_t & iss =
         h.handle_index_subspaces[handle_index];
@@ -470,13 +453,9 @@ struct data_client_policy_handler__<topology::mesh_topology__<POLICY_TYPE>> {
         h.type_hash,
         utils::hash::client_internal_field_hash(
           const_string_t("__flecsi_internal_index_subspace_index__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          si.index_subspace
-        )
-      );
+          NAMESPACE_HASH, NAME_HASH, si.index_subspace));
 
-      if(fi) {
+      if (fi) {
         iss.index_fid = fi->fid;
       }
 
@@ -512,7 +491,7 @@ struct data_client_policy_handler__<topology::set_topology__<POLICY_TYPE>> {
   }; // struct entity_info_t
 
   struct entity_walker_t
-      : public flecsi::utils::tuple_walker__<entity_walker_t> {
+    : public flecsi::utils::tuple_walker__<entity_walker_t> {
 
     template<typename TUPLE_ENTRY_TYPE>
     void handle_type() {
@@ -562,23 +541,18 @@ struct data_client_policy_handler__<topology::set_topology__<POLICY_TYPE>> {
 
     using flecsi::utils::const_string_t;
     size_t entity_index(0);
-    for(auto & ei : entity_walker.entity_info) {
+    for (auto & ei : entity_walker.entity_info) {
       data_client_handle_entity_t & ent = h.handle_entities[entity_index];
       ent.index_space = ei.index_space;
       ent.index_space2 = ei.active_migrate_index_space;
       ent.size = ei.size;
 
       const field_info_t * fi = context.get_field_info_from_key(
-        h.type_hash,
-        utils::hash::client_internal_field_hash(
-          const_string_t("__flecsi_internal_entity_data__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          ent.index_space
-        )
-      );
+        h.type_hash, utils::hash::client_internal_field_hash(
+                       const_string_t("__flecsi_internal_entity_data__").hash(),
+                       NAMESPACE_HASH, NAME_HASH, ent.index_space));
 
-      if(fi) {
+      if (fi) {
         ent.fid = fi->fid;
       }
 
@@ -586,13 +560,9 @@ struct data_client_policy_handler__<topology::set_topology__<POLICY_TYPE>> {
         h.type_hash,
         utils::hash::client_internal_field_hash(
           const_string_t("__flecsi_internal_active_entity_data__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          ent.index_space
-        )
-      );
+          NAMESPACE_HASH, NAME_HASH, ent.index_space));
 
-      if(fi) {
+      if (fi) {
         ent.fid2 = fi->fid;
       }
 
@@ -600,13 +570,9 @@ struct data_client_policy_handler__<topology::set_topology__<POLICY_TYPE>> {
         h.type_hash,
         utils::hash::client_internal_field_hash(
           const_string_t("__flecsi_internal_migrate_entity_data__").hash(),
-          NAMESPACE_HASH,
-          NAME_HASH,
-          ent.index_space
-        )
-      );
+          NAMESPACE_HASH, NAME_HASH, ent.index_space));
 
-      if(fi) {
+      if (fi) {
         ent.fid3 = fi->fid;
       }
 
@@ -641,8 +607,9 @@ struct data_client_interface__ {
 
   template<typename DATA_CLIENT_TYPE, size_t NAMESPACE_HASH, size_t NAME_HASH>
   static bool register_data_client(std::string const & name) {
-    static_assert(sizeof(DATA_CLIENT_TYPE) ==
-                    sizeof(typename DATA_CLIENT_TYPE::type_identifier_t),
+    static_assert(
+      sizeof(DATA_CLIENT_TYPE) ==
+        sizeof(typename DATA_CLIENT_TYPE::type_identifier_t),
       "Data clients may not add data members");
 
     using wrapper_t = client_registration_wrapper__<

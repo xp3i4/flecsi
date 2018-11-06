@@ -30,20 +30,21 @@ namespace utils {
 //!
 template<typename order_iterator, typename value_iterator>
 void
-reorder(const order_iterator order_begin,
+reorder(
+  const order_iterator order_begin,
   const order_iterator order_end,
   const value_iterator v) {
   using index_t = typename std::iterator_traits<order_iterator>::value_type;
   using diff_t = typename std::iterator_traits<order_iterator>::difference_type;
 
   auto remaining = order_end - 1 - order_begin;
-  for(index_t s = index_t(), d; remaining > 0; ++s) {
-    for(d = order_begin[diff_t(s)]; d > s; d = order_begin[diff_t(d)])
+  for (index_t s = index_t(), d; remaining > 0; ++s) {
+    for (d = order_begin[diff_t(s)]; d > s; d = order_begin[diff_t(d)])
       ;
-    if(d == s) {
+    if (d == s) {
       --remaining;
       auto temp = v[diff_t(s)];
-      while(d = order_begin[diff_t(d)], d != s) {
+      while (d = order_begin[diff_t(d)], d != s) {
         std::swap(temp, v[diff_t(d)]);
         --remaining;
       }
@@ -61,20 +62,21 @@ reorder(const order_iterator order_begin,
 //!
 template<typename order_iterator, typename value_iterator>
 void
-reorder_destructive(const order_iterator order_begin,
+reorder_destructive(
+  const order_iterator order_begin,
   const order_iterator order_end,
   const value_iterator v) {
   using index_t = typename std::iterator_traits<order_iterator>::value_type;
   using diff_t = typename std::iterator_traits<order_iterator>::difference_type;
 
   auto remaining = order_end - 1 - order_begin;
-  for(auto s = index_t(); remaining > 0; ++s) {
+  for (auto s = index_t(); remaining > 0; ++s) {
     auto d = order_begin[diff_t(s)];
-    if(d == index_t(-1))
+    if (d == index_t(-1))
       continue;
     --remaining;
     auto temp = v[diff_t(s)];
-    for(index_t d2; d != s; d = d2) {
+    for (index_t d2; d != s; d = d2) {
       std::swap(temp, v[diff_t(d)]);
       std::swap(order_begin[diff_t(d)], d2 = index_t(-1));
       --remaining;

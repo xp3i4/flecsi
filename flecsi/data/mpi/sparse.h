@@ -102,13 +102,14 @@ struct storage_class__<sparse> {
   template<typename T, size_t EP, size_t SP, size_t GP>
   using handle__ = sparse_handle__<T, EP, SP, GP>;
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     typename DATA_TYPE,
     size_t NAMESPACE,
     size_t NAME,
     size_t VERSION>
-  static handle__<DATA_TYPE, 0, 0, 0> get_handle(
-    const data_client_t & data_client) {
+  static handle__<DATA_TYPE, 0, 0, 0>
+  get_handle(const data_client_t & data_client) {
     static_assert(
       VERSION < utils::hash::field_max_versions, "max field version exceeded");
 
@@ -124,7 +125,7 @@ struct storage_class__<sparse> {
     auto & registered_sparse_field_data =
       context.registered_sparse_field_data();
     auto fieldDataIter = registered_sparse_field_data.find(field_info.fid);
-    if(fieldDataIter == registered_sparse_field_data.end()) {
+    if (fieldDataIter == registered_sparse_field_data.end()) {
       // get color_info for this field.
       auto & color_info =
         (context.coloring_info(field_info.index_space)).at(context.color());
@@ -132,7 +133,8 @@ struct storage_class__<sparse> {
 
       auto & im = context.sparse_index_space_info_map();
       auto iitr = im.find(field_info.index_space);
-      clog_assert(iitr != im.end(),
+      clog_assert(
+        iitr != im.end(),
         "sparse index space info not registered for index space: "
           << field_info.index_space);
 
@@ -142,8 +144,9 @@ struct storage_class__<sparse> {
       const size_t exclusive_reserve = iitr->second.exclusive_reserve;
 
       // TODO: deal with VERSION
-      context.register_sparse_field_data(field_info.fid, field_info.size,
-        color_info, max_entries_per_index, exclusive_reserve);
+      context.register_sparse_field_data(
+        field_info.fid, field_info.size, color_info, max_entries_per_index,
+        exclusive_reserve);
 
       context.register_sparse_field_metadata<DATA_TYPE>(
         field_info.fid, color_info, index_coloring);
@@ -171,7 +174,8 @@ struct storage_class__<sparse> {
     return h;
   }
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     typename DATA_TYPE,
     size_t NAMESPACE,
     size_t NAME,
@@ -190,7 +194,7 @@ struct storage_class__<sparse> {
     auto & registered_sparse_field_data =
       context.registered_sparse_field_data();
     auto fieldDataIter = registered_sparse_field_data.find(field_info.fid);
-    if(fieldDataIter == registered_sparse_field_data.end()) {
+    if (fieldDataIter == registered_sparse_field_data.end()) {
 
       // get color_info for this field.
       auto & color_info =
@@ -199,7 +203,8 @@ struct storage_class__<sparse> {
 
       auto & im = context.sparse_index_space_info_map();
       auto iitr = im.find(field_info.index_space);
-      clog_assert(iitr != im.end(),
+      clog_assert(
+        iitr != im.end(),
         "sparse index space info not registered for index space: "
           << field_info.index_space);
 
@@ -207,8 +212,9 @@ struct storage_class__<sparse> {
       const size_t exclusive_reserve = iitr->second.exclusive_reserve;
 
       // TODO: deal with VERSION
-      context.register_sparse_field_data(field_info.fid, field_info.size,
-        color_info, max_entries_per_index, exclusive_reserve);
+      context.register_sparse_field_data(
+        field_info.fid, field_info.size, color_info, max_entries_per_index,
+        exclusive_reserve);
 
       context.register_sparse_field_metadata<DATA_TYPE>(
         field_info.fid, color_info, index_coloring);
@@ -216,8 +222,9 @@ struct storage_class__<sparse> {
 
     auto & fd = registered_sparse_field_data[field_info.fid];
 
-    mutator_handle__<DATA_TYPE> h(fd.num_exclusive, fd.num_shared, fd.num_ghost,
-      fd.max_entries_per_index, slots);
+    mutator_handle__<DATA_TYPE> h(
+      fd.num_exclusive, fd.num_shared, fd.num_ghost, fd.max_entries_per_index,
+      slots);
 
     h.fid = field_info.fid;
     h.index_space = field_info.index_space;
@@ -244,24 +251,27 @@ struct storage_class__<ragged> {
   template<typename T, size_t EP, size_t SP, size_t GP>
   using handle__ = sparse_handle__<T, EP, SP, GP>;
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     typename DATA_TYPE,
     size_t NAMESPACE,
     size_t NAME,
     size_t VERSION>
   static auto get_handle(const data_client_t & data_client) {
-    return storage_class__<sparse>::get_handle<DATA_CLIENT_TYPE, DATA_TYPE,
-      NAMESPACE, NAME, VERSION>(data_client);
+    return storage_class__<sparse>::get_handle<
+      DATA_CLIENT_TYPE, DATA_TYPE, NAMESPACE, NAME, VERSION>(data_client);
   }
 
-  template<typename DATA_CLIENT_TYPE,
+  template<
+    typename DATA_CLIENT_TYPE,
     typename DATA_TYPE,
     size_t NAMESPACE,
     size_t NAME,
     size_t VERSION>
   static auto get_mutator(const data_client_t & data_client, size_t slots) {
-    return storage_class__<sparse>::get_mutator<DATA_CLIENT_TYPE, DATA_TYPE,
-      NAMESPACE, NAME, VERSION>(data_client, slots);
+    return storage_class__<sparse>::get_mutator<
+      DATA_CLIENT_TYPE, DATA_TYPE, NAMESPACE, NAME, VERSION>(
+      data_client, slots);
   }
 }; // struct storage_class_t
 
