@@ -593,19 +593,44 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
       offsets_data[r] = ac.template raw_rect_ptr<2>(dr, sr, bo);
       offsets_sizes[r] = sr.hi[1] - sr.lo[1] + 1;
       h.offsets_size += offsets_sizes[r];
+std::cout <<"IRINA DEBUG offset_s ="<<offsets_sizes[r]<<std::endl;
     } // for
 
+    assert( md->initialized);
+
+#ifndef MAPPER_COMPACTION
     h.offsets = new offset_t[h.offsets_size];
 
     size_t pos = 0;
-
-    assert( md->initialized);
 
     for(size_t r{0}; r < num_regions; ++r) {
       std::memcpy(
         h.offsets + pos, offsets_data[r], offsets_sizes[r] * sizeof(offset_t));
       pos += offsets_sizes[r];
     }
+#else
+   
+    Legion::LogicalRegion lr = offsets_prs[0].get_logical_region();
+    Legion::IndexSpace is = lr.get_index_space();
+    Legion::Domain domain = runtime->get_index_space_domain(context, is);
+
+    LegionRuntime::Arrays::Rect<2> dr = domain.get_rect<2>();
+    LegionRuntime::Arrays::Rect<2> sr;
+    LegionRuntime::Accessor::ByteOffset bo[2];
+
+    auto ac_shared_offset =
+			regions[region].get_field_accessor(h.fid).template typeify<offset_t>();
+    h.offsets = ac_shared_offset.template raw_rect_ptr<2>(dr, sr, bo);
+
+    size_t pos{0};
+    h.offsets_size=0;
+    for(size_t r{0}; r < num_regions; ++r) {
+      offsets_data[r] = h.offsets+pos;
+      h.offsets_size += offsets_sizes[r];
+      pos +=offsets_sizes[r];
+    }
+#endif
+
 
     region += num_regions;
 
@@ -634,6 +659,7 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
       h.entries_size += entries_sizes[r];
     } // for
 
+#ifndef MAPPER_COMPACTION
     entry_value_t * entries = new entry_value_t[h.entries_size];
 
     pos = 0;
@@ -645,6 +671,29 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
     }
 
     h.entries = entries;
+#else
+    Legion::LogicalRegion lr_e = entries_prs[0].get_logical_region();
+    Legion::IndexSpace is_e = lr_e.get_index_space();
+    Legion::Domain domain_e = runtime->get_index_space_domain(context, is_e);
+
+    LegionRuntime::Arrays::Rect<2> dr_e = domain_e.get_rect<2>();
+    LegionRuntime::Arrays::Rect<2> sr_e;
+    LegionRuntime::Accessor::ByteOffset bo_e[2];
+
+    auto ac_shared_entries =
+      regions[region].get_field_accessor(h.fid).
+				template typeify<entry_value_t>();
+    h.entries = ac_shared_entries.template raw_rect_ptr<2>(dr_e, sr_e, bo_e);
+
+    size_t pos_e{0};
+    h.entries_size =0;
+    for(size_t r{0}; r < num_regions; ++r) {
+      h.entries_data[r] = entries_data[r] = h.entries+pos_e;
+      h.entries_size += entries_sizes[r];
+      pos_e +=entries_sizes[r];
+    }
+
+#endif
 
     region += num_regions;
   }
@@ -728,6 +777,7 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
       h.offsets_size += offsets_sizes[r];
     } // for
 
+#ifndef MAPPER_COMPACTION
     h.offsets = new offset_t[h.offsets_size];
 
     size_t pos = 0;
@@ -747,6 +797,39 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
           h.reserve + i * md->max_entries_per_index);
       }
     }
+
+ #else
+
+    Legion::LogicalRegion lr = offsets_prs[0].get_logical_region();
+    Legion::IndexSpace is = lr.get_index_space();
+    Legion::Domain domain = runtime->get_index_space_domain(context, is);
+
+    LegionRuntime::Arrays::Rect<2> dr = domain.get_rect<2>();
+    LegionRuntime::Arrays::Rect<2> sr;
+    LegionRuntime::Accessor::ByteOffset bo[2];
+
+    auto ac_shared_offset =
+      regions[region].get_field_accessor(h.fid).template typeify<offset_t>();
+    h.offsets = ac_shared_offset.template raw_rect_ptr<2>(dr, sr, bo);
+
+    size_t pos{0};
+    h.offsets_size=0;
+    if(md->initialized) {
+      for(size_t r{0}; r < num_regions; ++r) {
+        offsets_data[r] = h.offsets+pos;
+        h.offsets_size += offsets_sizes[r];
+        pos +=offsets_sizes[r];
+      }
+    }else{
+      size_t n = md->num_shared + md->num_ghost;
+    
+      for(size_t i = 0; i < n; ++i) {
+        h.offsets[md->num_exclusive + i].set_offset(
+          h.reserve + i * md->max_entries_per_index);
+      }
+    }
+#endif
+
 
     region += num_regions;
 
@@ -775,6 +858,7 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
       h.entries_size += entries_sizes[r];
     } // for
 
+#ifndef MAPPER_COMPACTION
     entry_value_t * entries = new entry_value_t[h.entries_size];
 
     std::memcpy(entries, entries_data[0],
@@ -789,6 +873,32 @@ struct init_handles_t : public flecsi::utils::tuple_walker_u<init_handles_t> {
     }
 
     h.entries = reinterpret_cast<uint8_t *>(entries);
+
+#else
+    Legion::LogicalRegion lr_e = entries_prs[0].get_logical_region();
+    Legion::IndexSpace is_e = lr_e.get_index_space();
+    Legion::Domain domain_e = runtime->get_index_space_domain(context, is_e);
+
+    LegionRuntime::Arrays::Rect<2> dr_e = domain_e.get_rect<2>();
+    LegionRuntime::Arrays::Rect<2> sr_e;
+    LegionRuntime::Accessor::ByteOffset bo_e[2];
+
+    auto ac_shared_entries =
+      regions[region].get_field_accessor(h.fid).
+        template typeify<entry_value_t>();
+    h.entries = reinterpret_cast<uint8_t *>(
+			ac_shared_entries.template raw_rect_ptr<2>(dr_e, sr_e, bo_e));
+
+    size_t pos_e{0};
+    h.entries_size =0;
+    for(size_t r{0}; r < num_regions; ++r) {
+      h.entries_data[r] = entries_data[r] =
+				reinterpret_cast<entry_value_t *>(h.entries)+pos_e;
+      h.entries_size += entries_sizes[r];
+      pos_e +=entries_sizes[r];
+    }
+
+#endif
 
     region += num_regions;
   }
